@@ -37,13 +37,17 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     const totalTimeInMs = m + s + h;
 
     // 1) Guardar en storage: remaining = ms, aún no hay ruleId
-    chrome.storage.local.set({ [STORAGE_KEY]: { ...{} , [site]: { remaining: totalTimeInMs } } });
+    chrome.storage.local.get(STORAGE_KEY, data => {
+        const blocks = data[STORAGE_KEY] || {};
+        blocks[site] = { remaining: totalTimeInMs };
+        chrome.storage.local.set({ [STORAGE_KEY]: blocks });
+    });
 
     // 2) Crear alarma para cuando expire el tiempo de uso
-    chrome.alarms.create(`block_${site}`, { delayInMinutes: totalTimeInMs });
+    chrome.alarms.create(`block_${site}`, { when: Date.now() + totalTimeInMs });
 
     // 3) Crear alarma para reset 24h después
-    chrome.alarms.create(`reset_${site}`, { delayInMinutes: 1440 });
+    chrome.alarms.create(`reset_${site}`, { when: Date.now() + 24 * 60 * 60 * 1000 });
 
     sendResponse();
   }
