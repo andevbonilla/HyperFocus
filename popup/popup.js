@@ -160,9 +160,17 @@ form.addEventListener('submit', e => {
                  `${minsInput.value.padStart(2,'0')}:` +
                  `${secsInput.value.padStart(2,'0')}`;
   const color  = colorInput.value;
-
   const siteObj = { id, domain, time, color };
   blockedSites.push(siteObj);
+
+  // Block Site -> ADD rule in rules.json
+  const url = new URL(urlInput.value).hostname;
+  const minutes = parseInt(minsInput.value, 10);
+  const seconds = parseInt(secsInput.value, 10);
+  const hours   = parseInt(hrsInput.value, 10);
+  chrome.runtime.sendMessage({ action: 'scheduleBlock', site: url, minutes, seconds, hours });
+
+  // Save in storage
   saveBlockedSites();
   addBlockedSiteToDOM(siteObj);
   resetForm();
