@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HyperFocus</title>
+  <link rel="stylesheet" href="popup.css"/>
+</head>
+<body id="popup-body">
+
+  <div id="popup-container">
+    <header id="popup-header">
+      <h1 id="popup-title">HyperFocus</h1>
+      <button id="popup-close" title="Cerrar">×</button>
+    </header>
+
+    <ul id="blocked-list">
+      <!-- lista de sitios bloqueados… -->
+    </ul>
+
+    <button id="add-website-btn">+ Add website</button>
+
+    <!-- FORMULARIO OCULTO -->
+    <form id="add-website-form">
+      <!-- Color picker con previsualización -->
+      <div class="form-group">
+        <label for="color-input">Color Icono:</label>
+        <div class="wrap-color">
+          <div id="color-preview" class="preview-dot" title="Selecciona color"></div>
+          <input type="color" class="color-input" id="color-input" name="color-input" value="#ff3b3b"/>
+        </div>
+        
+      </div>
+    
+      <!-- URL -->
+      <div class="form-group">
+        <label for="url-input">URL del sitio a bloquear:</label>
+        <input
+          type="url"
+          id="url-input"
+          name="url-input"
+          placeholder="https://example.com"
+        />
+        <span class="error-message" id="url-input-error"></span>
+      </div>
+    
+      <!-- Tiempo separado en Hrs : Mins : Secs -->
+      <div class="form-group">
+        <label>Tiempo antes de bloquear el sitio:</label>
+        <div class="time-inputs">
+          <input type="number" id="hrs-input" min="0" max="24" placeholder="Hrs"/>
+          :
+          <input type="number" id="mins-input" min="0" max="59" placeholder="Mins"/>
+          :
+          <input type="number" id="secs-input" min="0" max="59" placeholder="Secs"/>
+        </div>
+        <span class="error-message" id="time-input-error"></span>
+      </div>
+    
+      <div class="form-buttons">
+        <button type="submit" id="form-submit">Bloquear</button>
+        <button type="button" id="form-cancel">Cancelar</button>
+      </div>
+    </form>    
+    
+
+  </div>
+
+  <script src="popup.js"></script>
+
+</body>
+</html>
