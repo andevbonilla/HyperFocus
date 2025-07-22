@@ -188,3 +188,42 @@
   .delete-btn svg {
     display: block;
   }
+
+  /* botones */
+  .buttons{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .btn {
+    padding: .7rem 1.5rem;
+    font-size: .9rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 3rem;
+    width: 100%;
+    transition: all .2s ease-in-out;
+    font-weight: 500;
+  }
+
+  .btn-current{
+    background: #6b6b6b;
+    color: #fff;
+  }
+
+  .btn-current:hover {
+    background: #606060;
+    color: #fff;
+  }
+
+  .btn-new{
+    background: #5e3cff;
+    color: #fff;
+  }
+
+  .btn-new:hover {
+    background: #5537eb;
+    color: #fff;
+  }

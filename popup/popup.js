@@ -6,7 +6,9 @@ document.getElementById('popup-close').addEventListener('click', () => {
 });
   
 // Obtener referencias a elementos
-const addBtn     = document.getElementById('add-website-btn');
+const addBtn     = document.getElementById('add-new-site-btn');
+const addCurrentBtn = document.getElementById('add-current-site-btn');
+
 const form       = document.getElementById('add-website-form');
 const cancelBtn  = document.getElementById('form-cancel');
 const submitBtn  = document.getElementById('form-submit');
@@ -77,6 +79,7 @@ function resetForm() {
   previewDot.style.background = '#ff3b3b';
   form.style.display = 'none';
   addBtn.style.display = 'block';
+  addCurrentBtn.style.display = 'block';
 }
 
 // Validaciones y habilitación de submit
@@ -132,8 +135,8 @@ function removeBlockedSite(id) {
   
 
 // Eventos de validación en tiempo real
-urlInput.addEventListener('input', toggleSubmit);
-[hrsInput, minsInput, secsInput].forEach(i => i.addEventListener('input', toggleSubmit));
+urlInput.addEventListener('keyup', toggleSubmit);
+[hrsInput, minsInput, secsInput].forEach(i => i.addEventListener('keyup', toggleSubmit));
 
 // Color picker oculto
 previewDot.addEventListener('click', () => colorInput.click());
@@ -143,6 +146,17 @@ colorInput.addEventListener('input', () => previewDot.style.background = colorIn
 addBtn.addEventListener('click', () => {
   form.style.display = 'block';
   addBtn.style.display = 'none';
+  addCurrentBtn.style.display = 'none';
+});
+addCurrentBtn.addEventListener('click', () => {
+  form.style.display = 'block';
+  addBtn.style.display = 'none';
+  addCurrentBtn.style.display = 'none';
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs.length === 0) return;
+    const activeTab = tabs[0];
+    urlInput.value = activeTab.url || ''; 
+  });
 });
 
 // Cancelar form
