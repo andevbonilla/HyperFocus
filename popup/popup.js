@@ -169,7 +169,7 @@ form.addEventListener('submit', e => {
   if (!validateUrl() || !validateTime()) return;
 
   // Crear objeto de sitio
-  const id     = Date.now();
+  const id     = Date.now() + Math.floor(Math.random() * 1000);
   const domain = urlInput.value.replace(/^https?:\/\//, '');
   const time   = `${hrsInput.value.padStart(2,'0')}:` +
                  `${minsInput.value.padStart(2,'0')}:` +
