@@ -7,7 +7,7 @@ let siteObjForm = {
   domain: null,
   time: null,
   color: null,
-  hasTime: false
+  hasTime: null
 };
 
 // Obtener referencias a elementos
@@ -119,10 +119,22 @@ function validateTime() {
   }
 }
 
-function toggleSubmit() {
-  let isDisabled = !(validateUrl() && validateTime())
+function toggleSummitButton() {
+
+  validateUrl();
+  let isDisabled = true;
+
+  if(siteObjForm.hasTime === null){
+    isDisabled = true;
+  }else if(siteObjForm.hasTime === true){
+    isDisabled = !(validateUrl() && validateTime())
+  }else{
+    isDisabled = !validateUrl()
+  }
+
   submitBtn.disabled = isDisabled;
   isDisabled ? submitBtn.classList.add('disabled') : submitBtn.classList.remove('disabled');
+  return isDisabled;
 }
 
 function removeBlockedSite(id) {
@@ -144,8 +156,8 @@ document.getElementById('popup-close').addEventListener('click', () => {
 });
 
 // Eventos de validación en tiempo real
-urlInput.addEventListener('keyup', toggleSubmit);
-[hrsInput, minsInput, secsInput].forEach(i => i.addEventListener('keyup', toggleSubmit));
+urlInput.addEventListener('keyup', toggleSummitButton);
+[hrsInput, minsInput, secsInput].forEach(i => i.addEventListener('keyup', toggleSummitButton));
 
 // Color picker oculto
 previewDot.addEventListener('click', () => colorInput.click());
@@ -157,12 +169,15 @@ alwaysOption.addEventListener('click', () => {
   withTimeOption.classList.remove('selected');
   timeGroup.style.display = 'none';
   siteObjForm.hasTime = false;
+  siteObjForm.time = null;
+  toggleSummitButton();
 });
 withTimeOption.addEventListener('click', () => {
   withTimeOption.classList.add('selected');
   alwaysOption.classList.remove('selected');
   timeGroup.style.display = 'block';
   siteObjForm.hasTime = true;
+  toggleSummitButton();
 });
 
 // Mostrar form
@@ -188,7 +203,7 @@ cancelBtn.addEventListener('click', resetForm);
 // Manejar envío: validar, persistir, actualizar UI
 form.addEventListener('submit', e => {
   e.preventDefault();
-  if (!validateUrl() || !validateTime()) return;
+  if (!!toggleSummitButton()) return;
 
   // Crear objeto de sitio
   siteObjForm.id     = Date.now() + Math.floor(Math.random() * 1000);
