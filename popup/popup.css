@@ -1,4 +1,9 @@
 /* popup.css */
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 #popup-body {
     margin: 0;
     font-family: sans-serif;
@@ -9,7 +14,6 @@
     color: #fff;
     padding: 20px;         /* +4px */
     width: 340px;          /* +40px */
-    box-sizing: border-box;
     border: 2px solid #5e3cff;
     border-radius: 8px;
   }
@@ -74,19 +78,12 @@
     padding: .7rem 1rem;
     border-radius: 6px;
   }
-  #add-website-form label {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 14px;
-  }
   #add-website-form input {
     width: 100%;
-    margin-bottom: 10px;
     padding: 6px 8px;
     font-size: 14px;
     border: 1px solid #444;
-    border-radius: 4px;
-    box-sizing: border-box;
+    border-radius: .2rem;
   }
   #add-website-form .form-buttons {
     display: flex;
@@ -182,6 +179,8 @@
 
   .form-group {
     margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
   }
 
   .delete-btn {
@@ -242,3 +241,44 @@
     opacity: .5;
     cursor: not-allowed;
   }
+
+  .form-title{
+    margin-bottom: .5rem;
+    font-size: .9rem;
+    font-weight: bold;
+  }
+  .time-option{
+    display: flex;
+    margin-bottom: .6rem;
+    flex-direction: column; 
+    background-color: #444;
+    opacity: .7;
+    border-radius: .8rem;
+    padding: .5rem 1rem;
+    cursor: pointer;
+    transition: all .2s ease-in-out;
+    font-size: .9rem;
+    font-weight: 500;
+  }
+  .time-option h4{
+    font-size: 1rem;
+    margin-bottom: .2rem;
+    font-weight: bold;
+  }
+
+  .time-option p{
+    font-size: .8rem;
+    opacity: .8;
+    font-weight: 400;
+  }
+
+  .time-option:hover {
+    background: #5e3cff;
+    color: #fff;
+    opacity: 1;
+  }
+
+  #time-group{
+    display: none;
+  }
+  

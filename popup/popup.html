@@ -27,7 +27,7 @@
     <form id="add-website-form">
       <!-- Color picker con previsualización -->
       <div class="form-group">
-        <label for="color-input">Color Icono:</label>
+        <label class="form-title" for="color-input">Color Icono:</label>
         <div class="wrap-color">
           <div id="color-preview" class="preview-dot" title="Selecciona color"></div>
           <input type="color" class="color-input" id="color-input" name="color-input" value="#ff3b3b"/>
@@ -37,7 +37,7 @@
     
       <!-- URL -->
       <div class="form-group">
-        <label for="url-input">URL del sitio a bloquear:</label>
+        <label class="form-title" for="url-input">URL del sitio a bloquear:</label>
         <input
           type="url"
           id="url-input"
@@ -46,20 +46,33 @@
         />
         <span class="error-message" id="url-input-error"></span>
       </div>
-    
-      <!-- Tiempo separado en Hrs : Mins : Secs -->
+
+      <!-- Preguntar si bloquear con tiempo -->
       <div class="form-group">
-        <label>Tiempo antes de bloquear el sitio:</label>
-        <div class="time-inputs">
-          <input type="number" id="hrs-input" min="0" max="24" placeholder="Hrs"/>
-          :
-          <input type="number" id="mins-input" min="0" max="59" placeholder="Mins"/>
-          :
-          <input type="number" id="secs-input" min="0" max="59" placeholder="Secs"/>
+        <h3 class="form-title">Selecciona una opción:</h3>
+        <div class="time-option">
+          <h4>Siempre</h4>
+          <p>El sitio se bloqueará siempre</p>
         </div>
-        <span class="error-message" id="time-input-error"></span>
+        <div class="time-option">
+          <h4>Con tiempo</h4>
+          <p>El sitio se bloqueará depues de un tiempo determinado</p>
+        </div>
+
+        <!-- Tiempo separado en Hrs : Mins : Secs -->
+        <div class="form-group" id="time-group">
+          <label class="form-title">Tiempo antes de bloquear el sitio:</label>
+          <div class="time-inputs">
+            <input type="number" id="hrs-input" min="0" max="24" placeholder="Hrs"/>
+            :
+            <input type="number" id="mins-input" min="0" max="59" placeholder="Mins"/>
+            :
+            <input type="number" id="secs-input" min="0" max="59" placeholder="Secs"/>
+          </div>
+          <span class="error-message" id="time-input-error"></span>
+        </div>  
       </div>
-    
+  
       <div class="form-buttons">
         <button type="submit" class="disabled" id="form-submit">Agregar</button>
         <button type="button" id="form-cancel">Cancelar</button>

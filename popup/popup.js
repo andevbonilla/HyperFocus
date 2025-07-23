@@ -38,11 +38,6 @@ function loadBlockedSites() {
   });
 }
 
-/** Guarda el array actualizado en storage */
-function saveBlockedSites() {
-  chrome.storage.local.set({ blockedSites });
-}
-
 // Inyecta un sitio bloqueado en la UI
 function addBlockedSiteToDOM({ id, domain, time, color }) {
   const li = document.createElement('li');
@@ -176,22 +171,19 @@ form.addEventListener('submit', e => {
                  `${secsInput.value.padStart(2,'0')}`;
   const color  = colorInput.value;
   const siteObj = { id, domain, time, color };
-  blockedSites.push(siteObj);
 
-  // Block Site -> ADD rule in rules.json
-  const url = new URL(urlInput.value).hostname;
-  const minutes = parseInt(minsInput.value, 10);
-  const seconds = parseInt(secsInput.value, 10);
-  const hours   = parseInt(hrsInput.value, 10);
-  chrome.runtime.sendMessage({ action: 'scheduleBlock', site: url, minutes, seconds, hours });
+  // sent to background to block save and block site
+  chrome.runtime.sendMessage({ action: 'addBlockedSite', id, domain, time, color }, (response) => {
+    if (response.success) {
+      blockedSites.push(siteObj);
+      addBlockedSiteToDOM(siteObj);
+      resetForm();
+    }
+  });
 
-  // Save in storage
-  saveBlockedSites();
-  addBlockedSiteToDOM(siteObj);
-  resetForm();
 });
 
 // Arranca
-document.addEventListener('DOMContentLoaded', loadBlockedSites);
+document.addEventListener('DOMContentLoaded', loadBlockedSites); 
 
   
