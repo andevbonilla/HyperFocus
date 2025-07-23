@@ -35,7 +35,6 @@ function loadBlockedSites() {
     blockedSites.forEach(site => {
       addBlockedSiteToDOM(site);
     });
-    toggleSubmit();
   });
 }
 
@@ -120,7 +119,9 @@ function validateTime() {
 }
 
 function toggleSubmit() {
-  submitBtn.disabled = !(validateUrl() && validateTime());
+  let isDisabled = !(validateUrl() && validateTime())
+  submitBtn.disabled = isDisabled;
+  isDisabled ? submitBtn.classList.add('disabled') : submitBtn.classList.remove('disabled');
 }
 
 function removeBlockedSite(id) {
