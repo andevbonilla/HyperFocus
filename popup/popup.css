@@ -281,4 +281,10 @@
   #time-group{
     display: none;
   }
+
+  .selected{
+    background: #5e3cff;
+    color: #fff;
+    opacity: 1;
+  }
   

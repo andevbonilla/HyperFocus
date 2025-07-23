@@ -1,10 +1,15 @@
 // popup.js
 
-// Cerrar el popup al hacer click en la "X"
-document.getElementById('popup-close').addEventListener('click', () => {
-    window.close();
-});
-  
+// main variables
+let blockedSites = [];
+let siteObjForm = {
+  id: null,
+  domain: null,
+  time: null,
+  color: null,
+  hasTime: false
+};
+
 // Obtener referencias a elementos
 const addBtn     = document.getElementById('add-new-site-btn');
 const addCurrentBtn = document.getElementById('add-current-site-btn');
@@ -22,11 +27,12 @@ const secsInput  = document.getElementById('secs-input');
 const timeError  = document.getElementById('time-input-error');
 const list       = document.getElementById('blocked-list');
 
+const alwaysOption = document.getElementById('always-option');
+const withTimeOption = document.getElementById('with-time-option');
+const timeGroup = document.getElementById('time-group');
+
 // Regex de validación
 const urlRegex = /^(https?:\/\/)[^\s/$.?#].[^\s]*$/i;
-
-// Array en memoria
-let blockedSites = [];
 
 /** Carga la lista desde chrome.storage.local al abrir el popup */
 function loadBlockedSites() {
@@ -129,6 +135,13 @@ function removeBlockedSite(id) {
     if (li) li.remove();
 }
   
+// JS EVENTOS-----------------------------------------------------------------------------------------------
+//=========================================================================================================
+
+// Cerrar el popup al hacer click en la "X"
+document.getElementById('popup-close').addEventListener('click', () => {
+  window.close();
+});
 
 // Eventos de validación en tiempo real
 urlInput.addEventListener('keyup', toggleSubmit);
@@ -137,6 +150,20 @@ urlInput.addEventListener('keyup', toggleSubmit);
 // Color picker oculto
 previewDot.addEventListener('click', () => colorInput.click());
 colorInput.addEventListener('input', () => previewDot.style.background = colorInput.value);
+
+// Eventos de las opciones de tiempo
+alwaysOption.addEventListener('click', () => {
+  alwaysOption.classList.add('selected');
+  withTimeOption.classList.remove('selected');
+  timeGroup.style.display = 'none';
+  siteObjForm.hasTime = false;
+});
+withTimeOption.addEventListener('click', () => {
+  withTimeOption.classList.add('selected');
+  alwaysOption.classList.remove('selected');
+  timeGroup.style.display = 'block';
+  siteObjForm.hasTime = true;
+});
 
 // Mostrar form
 addBtn.addEventListener('click', () => {
@@ -164,19 +191,21 @@ form.addEventListener('submit', e => {
   if (!validateUrl() || !validateTime()) return;
 
   // Crear objeto de sitio
-  const id     = Date.now() + Math.floor(Math.random() * 1000);
-  const domain = urlInput.value.replace(/^https?:\/\//, '');
-  const time   = `${hrsInput.value.padStart(2,'0')}:` +
-                 `${minsInput.value.padStart(2,'0')}:` +
-                 `${secsInput.value.padStart(2,'0')}`;
-  const color  = colorInput.value;
-  const siteObj = { id, domain, time, color };
+  siteObjForm.id     = Date.now() + Math.floor(Math.random() * 1000);
+  siteObjForm.domain = urlInput.value.replace(/^https?:\/\//, '');
+  siteObjForm.color  = colorInput.value;
+  
+  if (!!siteObjForm.hasTime) {
+    siteObjForm.time   = `${hrsInput.value.padStart(2,'0')}:` +
+                         `${minsInput.value.padStart(2,'0')}:` +
+                         `${secsInput.value.padStart(2,'0')}`;
+  }
 
   // sent to background to block save and block site
-  chrome.runtime.sendMessage({ action: 'addBlockedSite', id, domain, time, color }, (response) => {
+  chrome.runtime.sendMessage({ action: 'addBlockedSite', siteObjForm }, (response) => {
     if (response.success) {
-      blockedSites.push(siteObj);
-      addBlockedSiteToDOM(siteObj);
+      blockedSites.push(siteObjForm);
+      addBlockedSiteToDOM(siteObjForm);
       resetForm();
     }
   });
