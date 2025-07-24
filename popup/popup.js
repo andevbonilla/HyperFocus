@@ -4,7 +4,8 @@
 let blockedSites = [];
 let siteObjForm = {
   id: null,
-  domain: null,
+  fullUrl: null,
+  host: null,
   time: null,
   color: null,
   hasTime: null
@@ -33,6 +34,7 @@ const timeGroup = document.getElementById('time-group');
 
 // Regex de validación
 const urlRegex = /^(https?:\/\/)[^\s/$.?#].[^\s]*$/i;
+const hostRegex = /^(?:www\.)?[A-Za-z0-9-]+\.[A-Za-z]{2,}$/i;
 
 /** Carga la lista desde chrome.storage.local al abrir el popup */
 function loadBlockedSites() {
@@ -45,13 +47,14 @@ function loadBlockedSites() {
 }
 
 // Inyecta un sitio bloqueado en la UI
-function addBlockedSiteToDOM({ id, domain, time, color }) {
+function addBlockedSiteToDOM(siteObjForm) {
+  const { id, host, time, color } = siteObjForm;
   const li = document.createElement('li');
   li.className = 'blocked-item';
   li.id = `blocked-item-${id}`;
   li.innerHTML = `
     <span class="dot" id="dot-${id}" style="background:${color}"></span>
-    <span class="domain" id="domain-${id}">${domain}</span>
+    <span class="domain" id="domain-${id}">${host}</span>
     <time class="timer" id="timer-${id}">${time}</time>
     <button class="delete-btn" id="delete-${id}" title="Eliminar">
       <!-- icono SVG de caneca -->
@@ -80,21 +83,27 @@ function resetForm() {
   form.style.display = 'none';
   addBtn.style.display = 'block';
   addCurrentBtn.style.display = 'block';
-}
-
-// Validaciones y habilitación de submit
-function validateUrl() {
-  const v = urlInput.value.trim();
-  if (urlRegex.test(v)) {
-    urlInput.classList.remove('input-error');
-    urlError.textContent = '';
-    return true;
-  } else {
+};
+function validateHOST() {
+  if (!hostRegex.test(urlInput.value)) {
     urlInput.classList.add('input-error');
     urlError.textContent = 'URL inválida, debe empezar por http:// o https://';
     return false;
+  } else {
+    urlInput.classList.remove('input-error');
+    urlError.textContent = '';
+    return true;
   }
 }
+function validateURL() {
+  const v = siteObjForm.fullUrl.trim();
+  if (urlRegex.test(v)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 
 function validateTime() {
   const h = parseInt(hrsInput.value, 10);
@@ -121,15 +130,15 @@ function validateTime() {
 
 function toggleSummitButton() {
 
-  validateUrl();
+  validateHOST();
   let isDisabled = true;
 
   if(siteObjForm.hasTime === null){
     isDisabled = true;
   }else if(siteObjForm.hasTime === true){
-    isDisabled = !(validateUrl() && validateTime())
+    isDisabled = !(validateHOST() && validateTime())
   }else{
-    isDisabled = !validateUrl()
+    isDisabled = !validateHOST()
   }
 
   submitBtn.disabled = isDisabled;
@@ -193,7 +202,10 @@ addCurrentBtn.addEventListener('click', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (tabs.length === 0) return;
     const activeTab = tabs[0];
-    urlInput.value = activeTab.url || ''; 
+    const urlModified = new URL(activeTab.url).host;
+    siteObjForm.fullUrl = activeTab.url;
+    siteObjForm.host = urlModified;
+    urlInput.value = urlModified || ''; 
   });
 });
 
@@ -203,11 +215,10 @@ cancelBtn.addEventListener('click', resetForm);
 // Manejar envío: validar, persistir, actualizar UI
 form.addEventListener('submit', e => {
   e.preventDefault();
-  if (!!toggleSummitButton()) return;
+  if (!!toggleSummitButton() && !validateURL()) return;
 
   // Crear objeto de sitio
   siteObjForm.id     = Date.now() + Math.floor(Math.random() * 1000);
-  siteObjForm.domain = urlInput.value.replace(/^https?:\/\//, '');
   siteObjForm.color  = colorInput.value;
   
   if (!!siteObjForm.hasTime) {
