@@ -229,11 +229,9 @@ form.addEventListener('submit', e => {
 
   // sent to background to block save and block site
   chrome.runtime.sendMessage({ action: 'addBlockedSite', siteObjForm }, (response) => {
-    if (response.success) {
       blockedSites.push(siteObjForm);
       addBlockedSiteToDOM(siteObjForm);
       resetForm();
-    }
   });
 
 });
