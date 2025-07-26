@@ -88,6 +88,9 @@ function resetForm() {
   addBtn.style.display = 'block';
   addCurrentBtn.style.display = 'block';
   hasTimeToggle = null;
+  alwaysOption.classList.remove('selected');
+  withTimeOption.classList.remove('selected');
+  timeGroup.style.display = 'none';
   submitBtn.classList.add('disabled')
 };
 function validateURL() {
