@@ -2,13 +2,7 @@
 
 // main variables
 let blockedSites = [];
-let siteObjForm = {
-  id: null,
-  fullUrl: null,
-  time: null,
-  color: null,
-  hasTime: null
-};
+let hasTimeToggle = null;
 
 // Obtener referencias a elementos
 const addBtn     = document.getElementById('add-new-site-btn');
@@ -40,7 +34,6 @@ const urlRegex = /^(https?:\/\/)[^\s/$.?#].[^\s]*$/i;
 function loadBlockedSites() {
   chrome.storage.local.get({ blockedSites: [] }, ({ blockedSites: saved }) => {
     blockedSites = saved;
-    console.log(blockedSites, "8888");
     blockedSites.forEach(site => {
       addBlockedSiteToDOM(site);
     });
@@ -55,7 +48,7 @@ async function addBlockedSiteToDOM(site) {
   let displayDomain = urlStr;
   try {
     const u = new URL(urlStr);
-    displayDomain = u.host + (u.pathname !== '/' ? u.pathname : '');
+    displayDomain = u.host;
   } catch {
     displayDomain = urlStr.replace(/^https?:\/\//, '');
   }
@@ -72,7 +65,14 @@ async function addBlockedSiteToDOM(site) {
     <span class="domain" id="domain-${id}">${displayDomain}</span>
     <time class="timer" id="timer-${id}">${time ?? ''}</time>
     <button class="delete-btn" id="delete-${id}" title="Eliminar">
-      <!-- svg -->
+      <svg xmlns="http://www.w3.org/2000/svg"
+           viewBox="0 0 24 24" width="22" height="22">
+        <rect x="4" y="1" width="16" height="2" fill="currentColor" rx="1"/>
+        <rect x="6" y="3" width="12" height="18" fill="currentColor" rx="2"/>
+        <rect x="8"  y="6" width="2" height="12" fill="#fff"/>
+        <rect x="11" y="6" width="2" height="12" fill="#fff"/>
+        <rect x="14" y="6" width="2" height="12" fill="#fff"/>
+      </svg>
     </button>
   `;
   li.querySelector('.delete-btn').addEventListener('click', async () => await removeBlockedSite(id));
@@ -87,11 +87,7 @@ function resetForm() {
   form.style.display = 'none';
   addBtn.style.display = 'block';
   addCurrentBtn.style.display = 'block';
-  siteObjForm.id = null;
-  siteObjForm.fullUrl = null;
-  siteObjForm.time = null;
-  siteObjForm.color = null;
-  siteObjForm.hasTime = null;
+  hasTimeToggle = null;
   submitBtn.classList.add('disabled')
 };
 function validateURL() {
@@ -132,9 +128,9 @@ function toggleSummitButton() {
 
   let isDisabled = true;
 
-  if(siteObjForm.hasTime === null){
+  if(hasTimeToggle === null){
     isDisabled = true;
-  }else if(siteObjForm.hasTime === true){
+  }else if(hasTimeToggle === true){
     isDisabled = !(validateURL() && validateTime())
   }else{
     isDisabled = !validateURL()
@@ -176,15 +172,14 @@ alwaysOption.addEventListener('click', () => {
   alwaysOption.classList.add('selected');
   withTimeOption.classList.remove('selected');
   timeGroup.style.display = 'none';
-  siteObjForm.hasTime = false;
-  siteObjForm.time = null;
+  hasTimeToggle = false;
   toggleSummitButton();
 });
 withTimeOption.addEventListener('click', () => {
   withTimeOption.classList.add('selected');
   alwaysOption.classList.remove('selected');
   timeGroup.style.display = 'block';
-  siteObjForm.hasTime = true;
+  hasTimeToggle = true;
   toggleSummitButton();
 });
 
@@ -217,8 +212,8 @@ form.addEventListener('submit', async (e) => {
     id: Date.now() + Math.floor(Math.random() * 1000),
     fullUrl: urlInput.value.trim(),
     color: colorInput.value,
-    hasTime: !!siteObjForm.hasTime,
-    time: siteObjForm.hasTime
+    hasTime: !!hasTimeToggle,
+    time: hasTimeToggle
       ? `${hrsInput.value.padStart(2,'0')}:${minsInput.value.padStart(2,'0')}:${secsInput.value.padStart(2,'0')}`
       : null,
   };
