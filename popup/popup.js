@@ -63,7 +63,7 @@ async function addBlockedSiteToDOM(site) {
   li.innerHTML = `
     <span class="dot" id="dot-${id}" style="background:${color}"></span>
     <span class="domain" id="domain-${id}">${displayDomain}</span>
-    <time class="timer" id="timer-${id}">${time ?? ''}</time>
+    <time class="timer" ${time ? "" : 'style="background:#ff3b3b"'} id="timer-${id}">${time ?? 'Always'}</time>
     <button class="delete-btn" id="delete-${id}" title="Eliminar">
       <svg xmlns="http://www.w3.org/2000/svg"
            viewBox="0 0 24 24" width="22" height="22">
@@ -126,6 +126,7 @@ function validateTime() {
 
 function toggleSummitButton() {
 
+  validateURL();
   let isDisabled = true;
 
   if(hasTimeToggle === null){
@@ -208,9 +209,12 @@ form.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (!!toggleSummitButton() && !validateURL()) return;
 
+  const url= new URL(urlInput.value.trim());
+  const urlWithoutPathname = `${url.protocol}//${url.host}`;
+
   const siteToSave = {
     id: Date.now() + Math.floor(Math.random() * 1000),
-    fullUrl: urlInput.value.trim(),
+    fullUrl: urlWithoutPathname,
     color: colorInput.value,
     hasTime: !!hasTimeToggle,
     time: hasTimeToggle
