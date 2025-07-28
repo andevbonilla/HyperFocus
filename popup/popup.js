@@ -211,6 +211,7 @@ cancelBtn.addEventListener('click', resetForm);
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (!!toggleSummitButton() && !validateURL()) return;
+  if (hasTimeToggle === null) return;
 
   const url= new URL(urlInput.value.trim());
   const urlWithoutPathname = `${url.protocol}//${url.host}`;
