@@ -329,37 +329,87 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
-  // Eliminar sitio (desde popup)
+  // Eliminar sitio (desde popup) — robusto y apaga overlay SOLO si era con tiempo
   if (message.action === 'removeBlockedSite') {
     (async () => {
       try {
         const { id } = message;
-        let { blockedSites = [] } = await chrome.storage.local.get('blockedSites');
 
-        const idx = blockedSites.findIndex(s => s.id === id);
-        if (idx === -1) {
+        // 1) Cargar storage y localizar el target por id
+        let { blockedSites = [] } = await chrome.storage.local.get('blockedSites');
+        const target = blockedSites.find(s => s.id === id);
+        if (!target) {
           sendResponse({ success: false, error: 'No se encontró el sitio' });
           return;
         }
 
-        const site = blockedSites[idx];
+        // 2) Hostname canónico
+        let hostname = '';
+        try { hostname = new URL(target.fullUrl).hostname; } catch {}
+        if (!hostname) {
+          // Fallback: elimina solo por id si la URL estaba mal formada
+          blockedSites = blockedSites.filter(s => s.id !== id);
+          await chrome.storage.local.set({ blockedSites });
+          sendResponse({ success: true, note: 'Eliminado por id; hostname inválido' });
+          return;
+        }
 
-        await removeBlockRuleForSite(site);
+        // 3) Conjunto de entradas (http/https) del mismo hostname
+        const sameHostEntries = blockedSites.filter(s => {
+          try { return new URL(s.fullUrl).hostname === hostname; }
+          catch { return false; }
+        });
 
-        blockedSites = blockedSites.filter(s => s.id !== id);
+        // ¿Alguna de esas entradas era "con tiempo"?
+        const hadTimed = sameHostEntries.some(s => s.hasTime === true);
+
+        // 4) Quitar TODAS las reglas DNR que apunten a ese hostname (evita residuos)
+        try {
+          const allRules = await chrome.declarativeNetRequest.getDynamicRules();
+          const toRemove = allRules
+            .filter(r => r?.condition?.urlFilter === `||${hostname}^`)
+            .map(r => r.id);
+          if (toRemove.length) {
+            await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: toRemove });
+          }
+        } catch (e) {
+          // Si fallara getDynamicRules, al menos intenta remover por el id del target
+          try {
+            const idRule = ruleIdForSite(target)
+            await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: [idRule] });
+          } catch {}
+        }
+
+        // 5) Eliminar del storage cualquier entrada con ese mismo hostname
+        const prevLen = blockedSites.length;
+        blockedSites = blockedSites.filter(s => {
+          try { return new URL(s.fullUrl).hostname !== hostname; }
+          catch { return true; }
+        });
+        const removedCount = prevLen - blockedSites.length;
         await chrome.storage.local.set({ blockedSites });
 
-        // Avisar a pestañas abiertas para apagar overlay
-        try {
-          const tabs = await queryTabsByHost(site.fullUrl);
+        // 6) Apagar overlay SOLO si había bloqueos con tiempo para ese hostname
+        if (hadTimed) {
+          // Reutiliza tu helper queryTabsByHost() si ya lo tienes.
+          // Si no lo tienes, puedes sustituir por chrome.tabs.query({ url: [`http://${hostname}/*`, `https://${hostname}/*`] })
+          let tabs = [];
+          try {
+            tabs = await chrome.tabs.query({ url: [`http://${hostname}/*`, `https://${hostname}/*`] });
+          } catch {}
+
           for (const t of tabs) {
             try {
-              await chrome.tabs.sendMessage(t.id, { type: 'stopTimerForHost', host: site.fullUrl });
+              // El content script compara por host, así que el esquema es irrelevante
+              await chrome.tabs.sendMessage(t.id, {
+                type: 'stopTimerForHost',
+                host: `https://${hostname}`
+              });
             } catch {}
           }
-        } catch {}
+        }
 
-        sendResponse({ success: true });
+        sendResponse({ success: true, removedCount, overlayStopped: hadTimed });
       } catch (err) {
         console.error(err);
         sendResponse({ success: false, error: err.message });
@@ -368,4 +418,5 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     return true;
   }
+
 });
