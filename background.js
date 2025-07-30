@@ -229,7 +229,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           }
         }
 
-        sendResponse({ success: true });
+        sendResponse({ success: true, site: siteObj });
       } catch (err) {
         console.error(err);
         sendResponse({ success: false, error: err.message });
