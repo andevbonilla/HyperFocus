@@ -63,6 +63,52 @@ async function addBlockRuleForSite(site) {
   });
 }
 
+async function removeBlockRuleForSite(site) {
+  try {
+    await chrome.declarativeNetRequest.updateDynamicRules({
+      removeRuleIds: [ruleIdForSite(site)]
+    });
+  } catch {}
+}
+
+// ---------- Helpers de pestañas (para efecto en tiempo real) ----------
+function urlToHostPatterns(fullUrl) {
+  const u = new URL(fullUrl);
+  return [`http://${u.host}/*`, `https://${u.host}/*`];
+}
+
+async function queryTabsByHost(fullUrl) {
+  try {
+    const tabs = await chrome.tabs.query({ url: urlToHostPatterns(fullUrl) });
+    return tabs || [];
+  } catch {
+    return [];
+  }
+}
+
+async function redirectTabsToBlocked(site) {
+  const blockedUrl = chrome.runtime.getURL('blocked.html') + `?host=${encodeURIComponent(site.fullUrl)}`;
+  const tabs = await queryTabsByHost(site.fullUrl);
+  for (const t of tabs) {
+    try { await chrome.tabs.update(t.id, { url: blockedUrl }); } catch {}
+  }
+}
+
+async function notifyTabsStartTimer(site) {
+  const tabs = await queryTabsByHost(site.fullUrl);
+  for (const t of tabs) {
+    try {
+      await chrome.tabs.sendMessage(t.id, {
+        type: 'dailyResetForHost',     // lo escucha tu content.js
+        host: site.fullUrl,
+        remainingSeconds: site.remainingSeconds | 0
+      });
+    } catch {
+      // puede fallar si la pestaña no tiene aún el content inyectado
+    }
+  }
+}
+
 // ---------- Sincronización de reglas al arrancar ----------
 async function syncAlwaysRules() {
   const { blockedSites = [] } = await chrome.storage.local.get('blockedSites');
@@ -107,12 +153,7 @@ async function resetTimedBudgetsIfNeeded(now = new Date()) {
     if (site.lastResetDay !== today) {
       site.remainingSeconds = parseHHMMSS(site.time || '00:00:00');
       site.lastResetDay = today;
-      // por si estaba bloqueado de ayer, quitar regla
-      try {
-        await chrome.declarativeNetRequest.updateDynamicRules({
-          removeRuleIds: [ruleIdForSite(site)]
-        });
-      } catch {}
+      await removeBlockRuleForSite(site); // por si quedó bloqueado ayer
       mutated = true;
     }
   }
@@ -126,20 +167,7 @@ async function resetTimedBudgetsIfNeeded(now = new Date()) {
 async function broadcastDailyReset(sites) {
   for (const site of sites) {
     if (!site.hasTime) continue;
-    try {
-      const u = new URL(site.fullUrl);
-      const patterns = [`http://${u.host}/*`, `https://${u.host}/*`];
-      const tabs = await chrome.tabs.query({ url: patterns });
-      for (const t of tabs) {
-        try {
-          await chrome.tabs.sendMessage(t.id, {
-            type: 'dailyResetForHost',
-            host: site.fullUrl,
-            remainingSeconds: site.remainingSeconds | 0
-          });
-        } catch {}
-      }
-    } catch {}
+    await notifyTabsStartTimer(site);
   }
 }
 
@@ -162,7 +190,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
 // ---------- Mensajería con popup/content ----------
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  // Añadir sitio bloqueado (desde popup)
+  // Añadir sitio bloqueado (desde popup) —> efecto inmediato desde background
   if (message.action === 'addBlockedSite') {
     const siteObj = message.siteObjForm;
 
@@ -181,12 +209,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           siteObj.remainingSeconds = parseHHMMSS(siteObj.time || '00:00:00');
         }
 
+        // Guardar
         blockedSites.push(siteObj);
         await chrome.storage.local.set({ blockedSites });
 
-        // Si es "Siempre", crear regla de bloqueo ya
+        // Efecto inmediato
         if (!siteObj.hasTime) {
+          // "Siempre": crea regla y redirige ya
           await addBlockRuleForSite(siteObj);
+          await redirectTabsToBlocked(siteObj);
+        } else {
+          // "Con tiempo": si tiempo = 0 => bloquear ya; si no, arrancar overlay
+          if ((siteObj.remainingSeconds | 0) <= 0) {
+            await addBlockRuleForSite(siteObj);
+            await redirectTabsToBlocked(siteObj);
+          } else {
+            await removeBlockRuleForSite(siteObj); // por si hubiese residuo
+            await notifyTabsStartTimer(siteObj);   // muestra overlay en vivo
+          }
         }
 
         sendResponse({ success: true });
@@ -213,9 +253,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (site.lastResetDay !== today) {
           site.remainingSeconds = parseHHMMSS(site.time || '00:00:00');
           site.lastResetDay = today;
-          await chrome.declarativeNetRequest.updateDynamicRules({
-            removeRuleIds: [ruleIdForSite(site)]
-          });
+          await removeBlockRuleForSite(site);
           await chrome.storage.local.set({ blockedSites });
         }
 
@@ -306,22 +344,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         const site = blockedSites[idx];
 
-        // Quitar regla si existiera
-        try {
-          await chrome.declarativeNetRequest.updateDynamicRules({
-            removeRuleIds: [ruleIdForSite(site)]
-          });
-        } catch {}
+        await removeBlockRuleForSite(site);
 
-        // Remover del almacenamiento
         blockedSites = blockedSites.filter(s => s.id !== id);
         await chrome.storage.local.set({ blockedSites });
 
         // Avisar a pestañas abiertas para apagar overlay
         try {
-          const u = new URL(site.fullUrl);
-          const patterns = [`http://${u.host}/*`, `https://${u.host}/*`];
-          const tabs = await chrome.tabs.query({ url: patterns });
+          const tabs = await queryTabsByHost(site.fullUrl);
           for (const t of tabs) {
             try {
               await chrome.tabs.sendMessage(t.id, { type: 'stopTimerForHost', host: site.fullUrl });

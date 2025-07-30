@@ -249,8 +249,6 @@ form.addEventListener('submit', async (e) => {
   try {
     const resp = await chrome.runtime.sendMessage({ action: 'addBlockedSite', siteObjForm: siteToSave });
     if (resp?.success) {
-      blockedSites.push(siteToSave);
-      addBlockedSiteToDOM(siteToSave);
       resetForm();
     } else {
       console.error('addBlockedSite error:', resp?.error);
