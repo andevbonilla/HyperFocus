@@ -32,6 +32,7 @@ const urlRegex = /^(https?:\/\/)[^\s/$.?#].[^\s]*$/i;
 
 /** Carga la lista desde chrome.storage.local al abrir el popup */
 function loadBlockedSites() {
+  console.log("ppppppp")
   chrome.storage.local.get({ blockedSites: [] }, ({ blockedSites: saved }) => {
     blockedSites = saved;
     blockedSites.forEach(site => {
@@ -146,14 +147,24 @@ function toggleSummitButton() {
 }
 
 async function removeBlockedSite(id) {
-    // 1) Quitar del array en memoria
-    blockedSites = blockedSites.filter(site => site.id !== id);
-    // 2) Guardar en storage
-    await chrome.storage.local.set({ blockedSites });
-    // 3) Quitar del DOM
-    const li = document.getElementById(`blocked-item-${id}`);
-    if (li) li.remove();
+  let resp;
+  try {
+    resp = await chrome.runtime.sendMessage({ action: 'removeBlockedSite', id });
+  } catch (e) {
+    console.error('removeBlockedSite error:', e);
+    return;
+  }
+  if (!resp?.success) {
+    console.error('removeBlockedSite error:', resp?.error || 'Desconocido');
+    return;
+  }
+
+  blockedSites = blockedSites.filter(site => site.id !== id);
+
+  const li = document.getElementById(`blocked-item-${id}`);
+  if (li) li.remove();
 }
+
   
 // JS EVENTOS-----------------------------------------------------------------------------------------------
 //=========================================================================================================

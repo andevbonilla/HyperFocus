@@ -3,37 +3,23 @@
   "name": "HyperFocus - Web Blocker and Web analytics",
   "description": "HyperFocus is a web blocker and web analytics tool that helps you to focus on your work and block the websites that distract you.",
   "version": "1.0.0",
-  "permissions": [
-    "declarativeNetRequest",
-    "storage",
-    "activeTab",
-    "alarms"
-  ],
-  "host_permissions": [
-    "<all_urls>"
-  ],
-  "action": {
+  "permissions": ["storage", "tabs", "alarms", "declarativeNetRequest"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "background.js" },
+  "action": { 
     "default_popup": "popup/popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
-    }
-  },
-  "background": {
-    "service_worker": "background.js"
-  },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "run_at": "document_end"
-    }
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": ["blocked.html"],
-      "matches": ["<all_urls>"]
-    }
-  ]
+    } },
+  "content_scripts": [{
+    "matches": ["<all_urls>"],
+    "js": ["scripts/content.js"],
+    "run_at": "document_idle"
+  }],
+  "web_accessible_resources": [{
+    "resources": ["blocked.html", "scripts/blocked.js"],
+    "matches": ["<all_urls>"]
+  }]
 }

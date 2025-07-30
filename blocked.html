@@ -17,10 +17,6 @@
     <h1>⛔ Sitio bloqueado</h1>
     <p>Tu tiempo asignado para <code id="host"></code> se ha agotado.</p>
   </div>
-  <script>
-    const params = new URLSearchParams(location.search);
-    const host = params.get('host') || '';
-    document.getElementById('host').textContent = host.replace(/^https?:\/\//,'');
-  </script>
+  <script src="scripts/blocked.js"></script>
 </body>
 </html>
