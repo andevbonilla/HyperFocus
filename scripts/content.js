@@ -5,6 +5,32 @@
   const OVERLAY_ID = '__hyperfocus_overlay__';
   window.__hyperfocus_timer ??= null;
 
+  // === Helpers de mensajería segura / vida del contexto ===
+  function extAlive() {
+    // true si la extensión sigue cargada (no desinstalada/recargada)
+    return !!(chrome && chrome.runtime && chrome.runtime.id);
+  }
+
+  async function safeSendMessage(payload) {
+    if (!extAlive()) return;
+    try {
+      await chrome.runtime.sendMessage(payload);
+    } catch (e) {
+      // Ignora errores típicos al descargar/recargar
+      const msg = String(e && (e.message || e));
+      if (
+        msg.includes('Extension context invalidated') ||
+        msg.includes('The message port closed before a response was received.') ||
+        msg.includes('Could not establish connection') ||
+        msg.includes('Receiving end does not exist')
+      ) {
+        return;
+      }
+      // Si quieres depurar otros casos:
+      // console.debug('safeSendMessage error:', e);
+    }
+  }
+
   function ensureOverlay() {
     let el = document.getElementById(OVERLAY_ID);
     if (!el) {
@@ -33,6 +59,14 @@
     return `${h}:${m}:${ss}`;
   }
 
+  function stopTimerOverlay() {
+    if (window.__hyperfocus_timer) {
+      clearInterval(window.__hyperfocus_timer);
+      window.__hyperfocus_timer = null;
+    }
+    document.getElementById(OVERLAY_ID)?.remove();
+  }
+
   function startTimer(pageUrl, initialRemaining) {
     if (window.__hyperfocus_timer) {
       clearInterval(window.__hyperfocus_timer);
@@ -43,9 +77,14 @@
     const overlay = ensureOverlay();
     overlay.textContent = 'Tiempo restante: ' + fmt(remaining);
     let lastSync = Date.now();
+    let unloading = false;
 
     const tick = () => {
-      if (document.visibilityState !== 'visible') return;
+      // Si la extensión se recargó o se está cerrando, no sigas
+      if (!extAlive()) { stopTimerOverlay(); return; }
+      if (unloading) return;
+
+      if (document.visibilityState !== 'visible') return; // no consumir si no es visible
       if (remaining <= 0) return;
 
       remaining -= 1;
@@ -54,34 +93,40 @@
       const now = Date.now();
       if (now - lastSync > 10_000) {
         lastSync = now;
-        chrome.runtime.sendMessage({ type: 'syncRemaining', pageUrl, remainingSeconds: remaining }).catch(() => {});
+        // <<< USAR helper seguro >>>
+        safeSendMessage({ type: 'syncRemaining', pageUrl, remainingSeconds: remaining });
       }
 
       if (remaining <= 0) {
         overlay.textContent = 'Tiempo agotado. Bloqueando…';
-        chrome.runtime.sendMessage({ type: 'timeUp', pageUrl }).catch(() => {});
-        clearInterval(window.__hyperfocus_timer);
-        window.__hyperfocus_timer = null;
+        safeSendMessage({ type: 'timeUp', pageUrl });
+        stopTimerOverlay();
       }
     };
 
     window.__hyperfocus_timer = setInterval(tick, 1000);
 
+    // Evita enviar durante descarga; además limpia el timer
+    const beforeUnload = () => { unloading = true; stopTimerOverlay(); };
+    const pageHide = () => { unloading = true; stopTimerOverlay(); };
+
+    window.addEventListener('beforeunload', beforeUnload, { once: true });
+    window.addEventListener('pagehide', pageHide, { once: true });
+
+    // Última sincronización “best effort” (si aún hay contexto)
     window.addEventListener('beforeunload', () => {
-      chrome.runtime.sendMessage({ type: 'syncRemaining', pageUrl, remainingSeconds: remaining }).catch(() => {});
+      if (!extAlive()) return;
+      safeSendMessage({ type: 'syncRemaining', pageUrl, remainingSeconds: remaining });
     }, { once: true });
   }
 
+  // === Mensajería desde background ===
   chrome.runtime.onMessage.addListener((msg) => {
     try {
       if (msg?.type === 'stopTimerForHost') {
         const targetHost = new URL(msg.host).host;
         if (location.host !== targetHost) return;
-        if (window.__hyperfocus_timer) {
-          clearInterval(window.__hyperfocus_timer);
-          window.__hyperfocus_timer = null;
-        }
-        document.getElementById(OVERLAY_ID)?.remove();
+        stopTimerOverlay();
       }
       if (msg?.type === 'dailyResetForHost') {
         const targetHost = new URL(msg.host).host;
@@ -94,8 +139,16 @@
   if (window.__hyperfocus_timer) return;
 
   (async function main() {
+    // Si la extensión no está disponible (se recargó), no inicies el overlay
+    if (!extAlive()) return;
     const pageUrl = location.href;
-    const resp = await chrome.runtime.sendMessage({ type: 'getTimeBudget', pageUrl }).catch(() => null);
+    let resp = null;
+    try {
+      resp = await chrome.runtime.sendMessage({ type: 'getTimeBudget', pageUrl });
+    } catch (e) {
+      // Si el contexto se invalidó justo aquí, abortar silenciosamente
+      return;
+    }
     if (!resp?.ok) return;
     if (resp.blockNow) return;
     startTimer(pageUrl, resp.remainingSeconds ?? 0);

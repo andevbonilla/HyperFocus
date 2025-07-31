@@ -1,4 +1,4 @@
-/* background.js — MV3 */
+/* background.js — MV3 (estable e idempotente) */
 
 // ---------- Utils de fecha/alarma ----------
 const DAILY_ALARM = 'hyperfocusDailyReset';
@@ -40,34 +40,60 @@ function parseHHMMSS(str) {
   return (+h)*3600 + (+m)*60 + (+s);
 }
 
+// ---------- IDs de regla: hash estable por hostname ----------
 function ruleIdForSite(site) {
-  const base = 100000; // evita colisiones con reglas existentes
-  return base + (site.id % 100000);
+  const hostname = new URL(site.fullUrl).hostname;
+  // FNV-1a 32-bit
+  let h = 2166136261;
+  for (let i = 0; i < hostname.length; i++) {
+    h ^= hostname.charCodeAt(i);
+    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+  }
+  // id en rango 1..2e9 (válido para DNR)
+  return 1 + (h % 2000000000);
 }
 
-function urlFilterForSite(site) {
-  const u = new URL(site.fullUrl);
-  return `||${u.hostname}^`; // bloquea dominio y subdominios del host concreto
+// ---------- Helpers DNR (idempotentes) ----------
+async function removeAllRulesForHostname(hostname) {
+  try {
+    const rules = await chrome.declarativeNetRequest.getDynamicRules();
+    const toRemove = rules
+      .filter(r => r?.condition?.urlFilter === `||${hostname}^`)
+      .map(r => r.id);
+    if (toRemove.length) {
+      await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: toRemove });
+    }
+  } catch {}
 }
 
 async function addBlockRuleForSite(site) {
+  const hostname = new URL(site.fullUrl).hostname;
+  const id = ruleIdForSite(site);
+
+  // Limpieza previa (por id y por hostname) para evitar "not unique ID"
+  try {
+    const existing = await chrome.declarativeNetRequest.getDynamicRules();
+    const toRemove = existing
+      .filter(r => r.id === id || r?.condition?.urlFilter === `||${hostname}^`)
+      .map(r => r.id);
+    if (toRemove.length) {
+      await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: toRemove });
+    }
+  } catch {}
+
   const rule = {
-    id: ruleIdForSite(site),
+    id,
     priority: 1,
     action: { type: 'redirect', redirect: { extensionPath: '/blocked.html' } },
-    condition: { urlFilter: urlFilterForSite(site), resourceTypes: ['main_frame'] }
+    condition: { urlFilter: `||${hostname}^`, resourceTypes: ['main_frame'] }
   };
-  await chrome.declarativeNetRequest.updateDynamicRules({
-    removeRuleIds: [rule.id],
-    addRules: [rule],
-  });
+  await chrome.declarativeNetRequest.updateDynamicRules({ addRules: [rule] });
 }
 
 async function removeBlockRuleForSite(site) {
   try {
-    await chrome.declarativeNetRequest.updateDynamicRules({
-      removeRuleIds: [ruleIdForSite(site)]
-    });
+    const hostname = new URL(site.fullUrl).hostname;
+    await removeAllRulesForHostname(hostname);
   } catch {}
 }
 
@@ -99,46 +125,34 @@ async function notifyTabsStartTimer(site) {
   for (const t of tabs) {
     try {
       await chrome.tabs.sendMessage(t.id, {
-        type: 'dailyResetForHost',     // lo escucha tu content.js
+        type: 'dailyResetForHost',     // lo escucha content.js
         host: site.fullUrl,
         remainingSeconds: site.remainingSeconds | 0
       });
     } catch {
-      // puede fallar si la pestaña no tiene aún el content inyectado
+      // Puede fallar si el content aún no está inyectado
     }
   }
 }
 
-// ---------- Sincronización de reglas al arrancar ----------
+// ---------- Sincronización de reglas al arrancar (idempotente) ----------
 async function syncAlwaysRules() {
   const { blockedSites = [] } = await chrome.storage.local.get('blockedSites');
-  const adds = [];
-  const removeIds = [];
-
   for (const site of blockedSites) {
-    const id = ruleIdForSite(site);
     if (!site.hasTime) {
-      // Sitios "Siempre" => asegurar regla
-      adds.push({
-        id,
-        priority: 1,
-        action: { type: 'redirect', redirect: { extensionPath: '/blocked.html' } },
-        condition: { urlFilter: urlFilterForSite(site), resourceTypes: ['main_frame'] }
-      });
+      // Siempre: asegurar bloqueo (remove-then-add)
+      await addBlockRuleForSite(site);
     } else {
-      // Sitios con tiempo => si queda tiempo, remover cualquier regla residual
+      // Con tiempo: si tiene tiempo → sin regla; si agotado → con regla
       const hasTimeLeft = typeof site.remainingSeconds === 'number'
         ? site.remainingSeconds > 0
         : true;
-      if (hasTimeLeft) removeIds.push(id);
+      if (hasTimeLeft) {
+        await removeBlockRuleForSite(site);
+      } else {
+        await addBlockRuleForSite(site);
+      }
     }
-  }
-
-  if (adds.length || removeIds.length) {
-    await chrome.declarativeNetRequest.updateDynamicRules({
-      removeRuleIds: removeIds,
-      addRules: adds
-    });
   }
 }
 
@@ -153,7 +167,7 @@ async function resetTimedBudgetsIfNeeded(now = new Date()) {
     if (site.lastResetDay !== today) {
       site.remainingSeconds = parseHHMMSS(site.time || '00:00:00');
       site.lastResetDay = today;
-      await removeBlockRuleForSite(site); // por si quedó bloqueado ayer
+      await removeBlockRuleForSite(site); // por si estaba bloqueado de ayer
       mutated = true;
     }
   }
@@ -190,7 +204,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
 // ---------- Mensajería con popup/content ----------
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  // Añadir sitio bloqueado (desde popup) —> efecto inmediato desde background
+  // Añadir sitio bloqueado (desde popup) — efecto inmediato desde background
   if (message.action === 'addBlockedSite') {
     const siteObj = message.siteObjForm;
 
@@ -198,8 +212,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       try {
         const { blockedSites = [] } = await chrome.storage.local.get('blockedSites');
 
-        if (blockedSites.some(s => s.fullUrl === siteObj.fullUrl)) {
-          sendResponse({ success: false, error: 'Ya existe URL' });
+        // Evitar duplicados por dominio (http/https)
+        const newHost = new URL(siteObj.fullUrl).hostname;
+        if (blockedSites.some(s => {
+          try { return new URL(s.fullUrl).hostname === newHost; }
+          catch { return false; }
+        })) {
+          sendResponse({ success: false, error: 'Ya existe un bloqueo para ese dominio' });
           return;
         }
 
@@ -219,7 +238,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           await addBlockRuleForSite(siteObj);
           await redirectTabsToBlocked(siteObj);
         } else {
-          // "Con tiempo": si tiempo = 0 => bloquear ya; si no, arrancar overlay
+          // "Con tiempo": si tiempo = 0 => bloquear ya; si no, overlay
           if ((siteObj.remainingSeconds | 0) <= 0) {
             await addBlockRuleForSite(siteObj);
             await redirectTabsToBlocked(siteObj);
@@ -364,21 +383,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const hadTimed = sameHostEntries.some(s => s.hasTime === true);
 
         // 4) Quitar TODAS las reglas DNR que apunten a ese hostname (evita residuos)
-        try {
-          const allRules = await chrome.declarativeNetRequest.getDynamicRules();
-          const toRemove = allRules
-            .filter(r => r?.condition?.urlFilter === `||${hostname}^`)
-            .map(r => r.id);
-          if (toRemove.length) {
-            await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: toRemove });
-          }
-        } catch (e) {
-          // Si fallara getDynamicRules, al menos intenta remover por el id del target
-          try {
-            const idRule = ruleIdForSite(target)
-            await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: [idRule] });
-          } catch {}
-        }
+        await removeAllRulesForHostname(hostname);
 
         // 5) Eliminar del storage cualquier entrada con ese mismo hostname
         const prevLen = blockedSites.length;
@@ -391,8 +396,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         // 6) Apagar overlay SOLO si había bloqueos con tiempo para ese hostname
         if (hadTimed) {
-          // Reutiliza tu helper queryTabsByHost() si ya lo tienes.
-          // Si no lo tienes, puedes sustituir por chrome.tabs.query({ url: [`http://${hostname}/*`, `https://${hostname}/*`] })
           let tabs = [];
           try {
             tabs = await chrome.tabs.query({ url: [`http://${hostname}/*`, `https://${hostname}/*`] });
@@ -400,7 +403,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
           for (const t of tabs) {
             try {
-              // El content script compara por host, así que el esquema es irrelevante
               await chrome.tabs.sendMessage(t.id, {
                 type: 'stopTimerForHost',
                 host: `https://${hostname}`
@@ -420,3 +422,4 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
 });
+
