@@ -10,21 +10,25 @@
 
   <div id="popup-container">
     <header id="popup-header">
-      <h1 id="popup-title">HyperFocus</h1>
+      <div class="logo">
+        <img src="logo.png" alt="Logo" id="popup-logo">
+        <h1 id="popup-title">HyperFocus</h1>
+      </div>
       <button id="popup-close" title="Cerrar">×</button>
     </header>
 
     <ul id="blocked-list">
+      <p id="no-blocked-sites" class="no-blocked-sites">Aun no hay sitios bloqueados</p>
       <!-- lista de sitios bloqueados… -->
     </ul>
 
     <div class="buttons">
-      <button id="add-current-site-btn" class="btn btn-new">Add Current Site</button>
-      <button id="add-new-site-btn" class="btn btn-current">Add New Site</button>
+      <button id="add-current-site-btn" class="btn btn-new">Block Current Site</button>
+      <button id="add-new-site-btn" class="btn btn-current">Block Other Site</button>
     </div>
 
     <!-- FORMULARIO OCULTO -->
-    <form id="add-website-form">
+    <form id="add-website-form" class="glass-bg">
       <!-- Color picker con previsualización -->
       <div class="form-group">
         <label class="form-title" for="color-input">Color Icono:</label>

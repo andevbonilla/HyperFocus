@@ -20,7 +20,7 @@ const minsInput  = document.getElementById('mins-input');
 const secsInput  = document.getElementById('secs-input');
 const timeError  = document.getElementById('time-input-error');
 const list       = document.getElementById('blocked-list');
-
+const noBlockedSites = document.getElementById('no-blocked-sites');
 const alwaysOption = document.getElementById('always-option');
 const withTimeOption = document.getElementById('with-time-option');
 const timeGroup = document.getElementById('time-group');
@@ -32,9 +32,13 @@ const urlRegex = /^(https?:\/\/)[^\s/$.?#].[^\s]*$/i;
 
 /** Carga la lista desde chrome.storage.local al abrir el popup */
 function loadBlockedSites() {
-  console.log("ppppppp")
   chrome.storage.local.get({ blockedSites: [] }, ({ blockedSites: saved }) => {
     blockedSites = saved;
+    if(blockedSites.length === 0){
+      noBlockedSites.style.display = 'block';
+    }else{
+      noBlockedSites.style.display = 'none';
+    }
     blockedSites.forEach(site => {
       addBlockedSiteToDOM(site);
     });
@@ -59,22 +63,52 @@ async function addBlockedSiteToDOM(site) {
   }
 
   const li = document.createElement('li');
-  li.className = 'blocked-item';
+  li.className = 'blocked-item glass-bg';
   li.id = `blocked-item-${id}`;
   li.innerHTML = `
-    <span class="dot" id="dot-${id}" style="background:${color}"></span>
-    <span class="domain" id="domain-${id}">${displayDomain}</span>
-    <time class="timer" ${time ? "" : 'style="background:#ff3b3b"'} id="timer-${id}">${time ?? 'Always'}</time>
-    <button class="delete-btn" id="delete-${id}" title="Eliminar">
-      <svg xmlns="http://www.w3.org/2000/svg"
-           viewBox="0 0 24 24" width="22" height="22">
-        <rect x="4" y="1" width="16" height="2" fill="currentColor" rx="1"/>
-        <rect x="6" y="3" width="12" height="18" fill="currentColor" rx="2"/>
-        <rect x="8"  y="6" width="2" height="12" fill="#fff"/>
-        <rect x="11" y="6" width="2" height="12" fill="#fff"/>
-        <rect x="14" y="6" width="2" height="12" fill="#fff"/>
-      </svg>
-    </button>
+    <div style="display: flex; align-items: center; overflow-x: hidden;">
+      <span class="dot" id="dot-${id}" style="background:${color}"></span>
+      <span class="domain" id="domain-${id}">${displayDomain}</span>
+    </div>
+    <div style="display: flex; align-items: center; padding-left: .6rem;">
+      ${
+        time ? 
+        `
+          <div style="display: flex; align-items: center; margin-left: .4rem;">
+            <time class="timer" style="font-size: .9rem;" id="timer-${id}">${time.split(':')[0]}</time>
+            <span style="font-size: .8rem; font-weight: bold; padding-left: .2rem;">H</span>
+          </div>
+          <div style="display: flex; align-items: center; margin-left: .4rem;">
+            <time class="timer" style="font-size: .9rem;" id="timer-${id}">${time.split(':')[1]}</time>
+            <span style="font-size: .8rem; font-weight: bold; padding-left: .2rem;">M</span>
+          </div>
+          <div style="display: flex; align-items: center; margin-left: .4rem;">
+            <time class="timer" style="font-size: .9rem;" id="timer-${id}">${time.split(':')[2]}</time>
+            <span style="font-size: .8rem; font-weight: bold; padding-left: .2rem;">S</span>
+          </div>
+        `
+        : ''
+      }
+      <button class="delete-btn" id="delete-${id}" title="Eliminar">
+          <svg xmlns="http://www.w3.org/2000/svg"
+              width="24" height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round">
+            <!-- Tapa de la papelera -->
+            <path d="M3 6h18"/>
+            <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/>
+            <!-- Cuerpo de la papelera -->
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <!-- Líneas internas (barras de documento) -->
+            <line x1="10" y1="11" x2="10" y2="17"/>
+            <line x1="14" y1="11" x2="14" y2="17"/>
+          </svg>
+        </button>
+    </div>
   `;
   li.querySelector('.delete-btn').addEventListener('click', async () => await removeBlockedSite(id));
   list.appendChild(li);
@@ -251,6 +285,7 @@ form.addEventListener('submit', async (e) => {
     if (resp?.success) {
       blockedSites.push(resp?.site);
       addBlockedSiteToDOM(resp?.site);
+      noBlockedSites.style.display = 'none';
       resetForm();
     } else {
       console.error('addBlockedSite error:', resp?.error);
