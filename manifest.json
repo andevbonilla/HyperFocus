@@ -19,7 +19,7 @@
     "run_at": "document_idle"
   }],
   "web_accessible_resources": [{
-    "resources": ["blocked.html", "scripts/blocked.js"],
+    "resources": ["blocked.html", "scripts/blocked.js", "icons/icon48.png"],
     "matches": ["<all_urls>"]
   }]
 }

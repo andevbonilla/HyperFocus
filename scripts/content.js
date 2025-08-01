@@ -34,18 +34,65 @@
   function ensureOverlay() {
     let el = document.getElementById(OVERLAY_ID);
     if (!el) {
+      // contenedor principal
       el = document.createElement('div');
       el.id = OVERLAY_ID;
-      el.style.position = 'fixed';
-      el.style.right = '12px';
-      el.style.bottom = '12px';
-      el.style.zIndex = '2147483647';
-      el.style.padding = '8px 12px';
-      el.style.borderRadius = '10px';
-      el.style.background = 'rgba(0,0,0,0.75)';
-      el.style.color = '#fff';
-      el.style.font = '13px/1 system-ui,-apple-system,Segoe UI,Roboto,Arial';
-      el.style.pointerEvents = 'none';
+      Object.assign(el.style, {
+        position: 'fixed',
+        right: '12px',
+        bottom: '12px',
+        zIndex: '2147483647',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '8px 16px',
+        borderRadius: '10px',
+        background: '#051043',            // azul oscuro
+        color: '#FFFFFF',                 // texto blanco
+        fontSize: '16px',
+        fontWeight: '600',
+        fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif',
+        pointerEvents: 'none'
+      });
+  
+      // icono de cohete (puedes cambiar por tu propia URL o data-URI)
+      const rocket = document.createElement('img');
+      rocket.src = chrome.runtime.getURL('icons/icon48.png');
+      rocket.style.width = '24px';
+      rocket.style.height = '24px';
+      rocket.style.marginRight = '8px';
+      el.appendChild(rocket);
+  
+      // span para el texto del timer
+      const text = document.createElement('span');
+      text.id = 'timer-text';
+      text.textContent = '00:00:00';    // valor inicial
+      el.appendChild(text);
+
+
+      // botón de cerrar
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = '✕';
+      closeBtn.type = 'button';
+      Object.assign(closeBtn.style, {
+        color: '#FFFFFF',
+        marginLeft: '12px',
+        width: '24px',
+        height: '24px',
+        borderRadius: '12px',
+        background: '#051043',
+        border: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '16px',
+        cursor: 'pointer',
+        pointerEvents: 'auto'               // que el botón sí reciba clics
+      });
+      closeBtn.addEventListener('click', () => {
+        el.remove();
+      });
+      el.appendChild(closeBtn);
+  
       document.documentElement.appendChild(el);
     }
     return el;
@@ -75,7 +122,7 @@
 
     let remaining = initialRemaining | 0;
     const overlay = ensureOverlay();
-    overlay.textContent = 'Tiempo restante: ' + fmt(remaining);
+    overlay.querySelector('#timer-text').textContent = fmt(remaining);
     let lastSync = Date.now();
     let unloading = false;
 
@@ -88,7 +135,7 @@
       if (remaining <= 0) return;
 
       remaining -= 1;
-      overlay.textContent = 'Tiempo restante: ' + fmt(remaining);
+      overlay.querySelector('#timer-text').textContent = fmt(remaining);
 
       const now = Date.now();
       if (now - lastSync > 10_000) {
@@ -98,7 +145,7 @@
       }
 
       if (remaining <= 0) {
-        overlay.textContent = 'Tiempo agotado. Bloqueando…';
+        overlay.querySelector('#timer-text').textContent = 'Tiempo agotado. Bloqueando…';
         safeSendMessage({ type: 'timeUp', pageUrl });
         stopTimerOverlay();
       }
