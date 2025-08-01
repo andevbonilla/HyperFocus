@@ -24,6 +24,12 @@ const noBlockedSites = document.getElementById('no-blocked-sites');
 const alwaysOption = document.getElementById('always-option');
 const withTimeOption = document.getElementById('with-time-option');
 const timeGroup = document.getElementById('time-group');
+const subHours = document.getElementById('sub-hours');
+const addHours = document.getElementById('add-hours');
+const subMins = document.getElementById('sub-mins');
+const addMins = document.getElementById('add-mins');
+const subSecs = document.getElementById('sub-secs');
+const addSecs = document.getElementById('add-secs');
 
 const generalError  = document.getElementById('general-error')
 
@@ -139,42 +145,77 @@ function validateURL() {
     return true;
   }
 }
-function validateTime() {
-  const h = parseInt(hrsInput.value, 10);
-  const m = parseInt(minsInput.value, 10);
-  const s = parseInt(secsInput.value, 10);
-  let err = '';
+function validateAndClampTime() {
+  let isValid = true;
+  
+  // Helper function to clamp value between min and max
+  const clampValue = (value, min, max) => {
+    const num = parseInt(value, 10) || min;
+    return Math.min(Math.max(num, min), max);
+  };
 
-  if ([h,m,s].some(v => isNaN(v))) {
-    err = 'El tiempo debe ser un número';
-  } else if (h < 0 || h > 23 || m < 0 || m > 59 || s < 0 || s > 59) {
-    err = 'Valores fuera de rango (max 23:59:59)';
+  // Validate and clamp hours (0-23)
+  if (hrsInput.value !== '') {
+    const clamped = clampValue(hrsInput.value, 0, 23);
+    if (clamped.toString() !== hrsInput.value) {
+      hrsInput.value = clamped;
+    }
+    hrsInput.classList.toggle('input-error', isNaN(clamped));
+    isValid = isValid && !isNaN(clamped);
   }
 
-  if (err) {
-    [hrsInput, minsInput, secsInput].forEach(i => i.classList.add('input-error'));
-    timeError.textContent = err;
-    return false;
+  // Validate and clamp minutes (0-59)
+  if (minsInput.value !== '') {
+    const clamped = clampValue(minsInput.value, 0, 59);
+    if (clamped.toString() !== minsInput.value) {
+      minsInput.value = clamped;
+    }
+    minsInput.classList.toggle('input-error', isNaN(clamped));
+    isValid = isValid && !isNaN(clamped);
+  }
+
+  // Validate and clamp seconds (0-59)
+  if (secsInput.value !== '') {
+    const clamped = clampValue(secsInput.value, 0, 59);
+    if (clamped.toString() !== secsInput.value) {
+      secsInput.value = clamped;
+    }
+    secsInput.classList.toggle('input-error', isNaN(clamped));
+    isValid = isValid && !isNaN(clamped);
+  }
+
+  // Check if total time is at least 1 second
+  if (isValid) {
+    const hours = parseInt(hrsInput.value || '0', 10);
+    const minutes = parseInt(minsInput.value || '0', 10);
+    const seconds = parseInt(secsInput.value || '0', 10);
+    const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
+    
+    if (totalSeconds < 1) {
+      timeError.textContent = 'El tiempo debe ser de al menos 1 segundo';
+      timeError.style.display = 'block';
+      isValid = false;
+    } else {
+      timeError.style.display = 'none';
+    }
   } else {
-    [hrsInput, minsInput, secsInput].forEach(i => i.classList.remove('input-error'));
-    timeError.textContent = '';
-    return true;
+    timeError.textContent = 'Por favor ingrese valores válidos';
+    timeError.style.display = 'block';
   }
+
+  return isValid;
 }
 
 function toggleSummitButton() {
-
-  validateURL();
-  let isDisabled = true;
-
-  if(hasTimeToggle === null){
-    isDisabled = true;
-  }else if(hasTimeToggle === true){
-    isDisabled = !(validateURL() && validateTime())
-  }else{
-    isDisabled = !validateURL()
+  const isURLValid = validateURL();
+  let isTimeValid = true;
+  
+  if (hasTimeToggle === true) {
+    isTimeValid = validateAndClampTime();
   }
-
+  
+  const isDisabled = hasTimeToggle === null || !isURLValid || (hasTimeToggle && !isTimeValid);
+  
   submitBtn.disabled = isDisabled;
   isDisabled ? submitBtn.classList.add('disabled') : submitBtn.classList.remove('disabled');
   return isDisabled;
@@ -208,9 +249,94 @@ document.getElementById('popup-close').addEventListener('click', () => {
   window.close();
 });
 
+addHours.addEventListener('click', () => {
+  if(hrsInput.value.length === 0){
+    hrsInput.value = 1;
+  } else {
+    let newValue = parseInt(hrsInput.value, 10) + 1;
+    hrsInput.value = newValue > 23 ? 0 : newValue;
+    timeError.style.display = 'none';
+    hrsInput.classList.remove('input-error');
+  }
+  toggleSummitButton();
+})
+addMins.addEventListener('click', () => {
+  if(minsInput.value.length === 0){
+    minsInput.value = 1;
+  } else {
+    let newValue = parseInt(minsInput.value, 10) + 1;
+    minsInput.value = newValue > 59 ? 0 : newValue;
+    timeError.style.display = 'none';
+    minsInput.classList.remove('input-error');
+  }
+  toggleSummitButton();
+})
+addSecs.addEventListener('click', () => {
+  if(secsInput.value.length === 0){
+    secsInput.value = 1;
+  } else {
+    let newValue = parseInt(secsInput.value, 10) + 1;
+    secsInput.value = newValue > 59 ? 0 : newValue;
+    timeError.style.display = 'none';
+    secsInput.classList.remove('input-error');
+  }
+  toggleSummitButton();
+})
+subHours.addEventListener('click', () => {
+  if(hrsInput.value.length === 0){
+    hrsInput.value = 23;
+  } else {
+    let newValue = parseInt(hrsInput.value, 10) - 1;
+    hrsInput.value = newValue < 0 ? 23 : newValue;
+    timeError.style.display = 'none';
+    hrsInput.classList.remove('input-error');
+  }
+  toggleSummitButton();
+})
+subMins.addEventListener('click', () => {
+  if(minsInput.value.length === 0){
+    minsInput.value = 59;
+  } else {
+    let newValue = parseInt(minsInput.value, 10) - 1;
+    minsInput.value = newValue < 0 ? 59 : newValue;
+    timeError.style.display = 'none';
+    minsInput.classList.remove('input-error');
+  }
+  toggleSummitButton();
+})
+subSecs.addEventListener('click', () => { 
+  if(secsInput.value.length === 0){
+    secsInput.value = 59;
+  } else {
+    let newValue = parseInt(secsInput.value, 10) - 1;
+    secsInput.value = newValue < 0 ? 59 : newValue;
+    timeError.style.display = 'none';
+    secsInput.classList.remove('input-error');
+  }
+  toggleSummitButton();
+})
+
 // Eventos de validación en tiempo real
-urlInput.addEventListener('keyup', toggleSummitButton);
-[hrsInput, minsInput, secsInput].forEach(i => i.addEventListener('keyup', toggleSummitButton));
+const validateInput = (e) => {
+  // Only allow numbers
+  e.target.value = e.target.value.replace(/[^0-9]/g, '');
+  toggleSummitButton();
+};
+
+urlInput.addEventListener('input', toggleSummitButton);
+[hrsInput, minsInput, secsInput].forEach(input => {
+  input.addEventListener('input', validateInput);
+  input.addEventListener('blur', () => {
+    // Ensure values are clamped when input loses focus
+    if (input.value !== '') {
+      const min = 0;
+      const max = input === hrsInput ? 23 : 59;
+      const num = parseInt(input.value, 10) || min;
+      input.value = Math.min(Math.max(num, min), max);
+    }
+    toggleSummitButton();
+  });
+});
 
 // Color picker oculto
 previewDot.addEventListener('click', () => colorInput.click());

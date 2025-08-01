@@ -6,7 +6,7 @@
   <title>HyperFocus</title>
   <link rel="stylesheet" href="popup.css"/>
 </head>
-<body id="popup-body">
+<body>
 
   <div id="popup-container">
     <header id="popup-header">
@@ -56,22 +56,32 @@
         <h3 class="form-title">Selecciona una opción:</h3>
         <div class="time-option" id="always-option">
           <h4>Siempre</h4>
-          <p>Siempre estara bloqueado, a menos que lo desbloquee manualmente.</p>
+          <p>El sitio siempre permanecera bloqueado.</p>
         </div>
         <div class="time-option" id="with-time-option">
           <h4>Con tiempo</h4>
-          <p>Se bloqueara depues de un tiempo de uso, se reinicia diariamente.</p>
+          <p>Solo podras usar el sitio por un tiempo cada dia, despues de ese tiempo se bloqueara.</p>
         </div>
 
         <!-- Tiempo separado en Hrs : Mins : Secs -->
         <div class="form-group" id="time-group">
-          <label class="form-title">Tiempo antes de bloquear el sitio:</label>
+          <label class="form-title">Tiempo:</label>
           <div class="time-inputs">
-            <input type="number" id="hrs-input" min="0" max="24" placeholder="Hrs"/>
-            :
-            <input type="number" id="mins-input" min="0" max="59" placeholder="Mins"/>
-            :
-            <input type="number" id="secs-input" min="0" max="59" placeholder="Secs"/>
+            <div class="time-input">
+              <button type="button" class="adding-btn" id="sub-hours">-</button>
+              <input type="number" id="hrs-input" min="0" max="24" placeholder="Hrs"/>
+              <button type="button" class="subtracting-btn" id="add-hours">+</button>
+            </div>
+            <div class="time-input">
+              <button type="button" class="adding-btn" id="sub-mins">-</button>
+              <input type="number" id="mins-input" min="0" max="59" placeholder="Mins"/>
+              <button type="button" class="subtracting-btn" id="add-mins">+</button>
+            </div>
+            <div class="time-input">
+              <button type="button" class="adding-btn" id="sub-secs">-</button>
+              <input type="number" id="secs-input" min="0" max="59" placeholder="Secs"/>
+              <button type="button" class="subtracting-btn" id="add-secs">+</button>
+            </div>
           </div>
           <span class="error-message" id="time-input-error"></span>
         </div>  

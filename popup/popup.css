@@ -4,22 +4,22 @@
   padding: 0;
   box-sizing: border-box;
 }
-
-html, body {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(0deg, rgba(57, 59, 150, 1) 0%, rgba(10, 13, 102, 1) 40%, rgba(10, 13, 102, 1) 100%);
+input{
+    padding: .6rem .8rem;
+    border: transparent;
+    border-radius: .3rem;
+    font-size: .9rem;
 }
-
-#popup-body {
-    margin: 0;
-    font-size: 16px;       /* +2px */
+input:focus{
+    outline: none;
+    box-shadow: none;
 }
 #popup-container {
     color: #fff;
     padding: 1.5rem;         /* +4px */
     width: 30rem;          /* +40px */
     border-radius: .5rem;
+    background: linear-gradient(0deg, rgba(57, 59, 150, 1) 0%, rgba(10, 13, 102, 1) 40%, rgba(10, 13, 102, 1) 100%);
 }
 #popup-header {
     display: flex;
@@ -110,7 +110,7 @@ border: 3px solid transparent;     /* crea “espacio” alrededor del thumb */
     font-weight: 500;
 }
 .timer {
-    background: #9514b2;
+    background: #9600cd;
     color: #fff;
     border-radius: .5rem;
     padding: .2rem .4rem;      /* +2px */
@@ -129,21 +129,14 @@ border: 3px solid transparent;     /* crea “espacio” alrededor del thumb */
 #add-website-form {
     display: none;
     margin-top: 1rem;
-    padding: .7rem 1rem;
+    padding: 1.7rem;
     border-radius: 6px;
-}
-#add-website-form input {
-    width: 100%;
-    padding: 6px 8px;
-    font-size: 14px;
-    border: 1px solid #444;
-    border-radius: .2rem;
 }
 #add-website-form .form-buttons {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
-    margin: 1rem 0;
+    margin: 0 0 1rem 0;
 }
 #add-website-form button {
     padding: 6px 12px;
@@ -154,14 +147,14 @@ border: 3px solid transparent;     /* crea “espacio” alrededor del thumb */
     transition: all .2s ease-in-out;
 }
 #form-submit {
-    background: #e86c00;
-    color: #12004d;
+    background: #9600cd;
+    color: #fff;
 }
 #form-submit:hover {
-    background: #ff8011;
+    background: #a400df;
 }
 #form-submit.disabled:hover {
-    background: #e86c00;
+    background: #9600cd;
     cursor: not-allowed;
 }
 #form-cancel {
@@ -169,12 +162,12 @@ border: 3px solid transparent;     /* crea “espacio” alrededor del thumb */
     color: #fff;
 }
 #form-cancel:hover {
-    background: #333;
+    background: #5c5c5c;
     color: #fff;
 }
 /* errores */
 .input-error {
-    border-color: red !important;
+    border: 1px solid red !important;
     color: red !important;
 }
 .error-message {
@@ -215,21 +208,58 @@ border: 3px solid transparent;     /* crea “espacio” alrededor del thumb */
 }
 
 /* contenedor de los tres inputs de tiempo */
+/* Hide number input spinners */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
 .time-inputs {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+}
+.time-input{
     display: flex;
     align-items: center;
     justify-content: center;
 }
-.time-inputs input {
-    width: 50px;
-    padding: 4px;
-    font-size: 14px;
+.time-input input {
+    width: 100%;
+    padding: .8rem .4rem;
+    font-size: 1rem;
     text-align: center;
-    border: 1px solid #444;
-    border-radius: 4px;
-    margin: 0 4px;
+    border: 1px solid #9600cd;
+    border-radius: 1rem;
+    margin: .5rem;
 }
-
+.adding-btn, .subtracting-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: .5rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    border-radius: 100% !important;
+    background: #9600cd;
+    color: #fff;
+    transition: all .2s ease-in-out;
+}
+.adding-btn:hover {
+    background: #a400df;
+}
+.subtracting-btn:hover {
+    background: #a400df;
+}
 .form-group {
     margin-top: 1rem;
     display: flex;
@@ -282,12 +312,12 @@ border: 3px solid transparent;     /* crea “espacio” alrededor del thumb */
 }
 
 .btn-new{
-    background: #85119e;
+    background: #9600cd;
     color: #fff;
 }
 
 .btn-new:hover {
-    background: #9514b2;
+    background: #a400df;
     color: #fff;
 }
 .disabled {
@@ -296,9 +326,11 @@ border: 3px solid transparent;     /* crea “espacio” alrededor del thumb */
 }
 
 .form-title{
-    margin-bottom: .5rem;
-    font-size: .9rem;
+    margin-bottom: .6rem;
+    font-size: 1rem;
     font-weight: bold;
+    color: #fff !important;
+    opacity: 1 !important;
 }
 .time-option{
     display: flex;
@@ -327,7 +359,7 @@ border: 3px solid transparent;     /* crea “espacio” alrededor del thumb */
 }
 
 .time-option:hover {
-    background: #85119e;
+    background: #9600cd;
     color: #fff;
     opacity: 1;
 }
@@ -337,7 +369,7 @@ border: 3px solid transparent;     /* crea “espacio” alrededor del thumb */
 }
 
 .selected{
-    background: #9514b2;
+    background: #9600cd;
     color: #fff;
     opacity: 1;
 }
