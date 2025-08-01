@@ -89,7 +89,7 @@
         pointerEvents: 'auto'               // que el botón sí reciba clics
       });
       closeBtn.addEventListener('click', () => {
-        el.remove();
+        el.style.display = 'none';
       });
       el.appendChild(closeBtn);
   
