@@ -3,6 +3,55 @@
 // ---------- Utils de fecha/alarma ----------
 const DAILY_ALARM = 'hyperfocusDailyReset';
 
+// Devuelve el objeto del sitio por hostname, o null
+async function findSiteByHostname(hostname) {
+  const { blockedSites = [] } = await chrome.storage.local.get('blockedSites');
+  const site = blockedSites.find(s => {
+    try { return new URL(s.fullUrl).hostname === hostname; }
+    catch { return false; }
+  });
+  return site || null;
+}
+
+// Decide si hay que bloquear *ahora* una URL concreta (aplica reset diario “perezoso”)
+async function shouldBlockNowForUrl(url) {
+  let u;
+  try { u = new URL(url); } catch { return { block: false }; }
+  if (u.protocol !== 'http:' && u.protocol !== 'https:') return { block: false };
+
+  const hostname = u.hostname;
+  const data = await chrome.storage.local.get('blockedSites');
+  const blockedSites = data.blockedSites || [];
+  const site = blockedSites.find(s => {
+    try { return new URL(s.fullUrl).hostname === hostname; }
+    catch { return false; }
+  });
+  if (!site) return { block: false };
+
+  // Sitio "Siempre"
+  if (!site.hasTime) return { block: true, site };
+
+  // Reset diario perezoso
+  const today = todayKey();
+  let mutated = false;
+  if (site.lastResetDay !== today) {
+    site.remainingSeconds = parseHHMMSS(site.time || '00:00:00');
+    site.lastResetDay = today;
+    mutated = true;
+  }
+  if (typeof site.remainingSeconds !== 'number') {
+    site.remainingSeconds = parseHHMMSS(site.time || '00:00:00');
+    mutated = true;
+  }
+  if (mutated) await chrome.storage.local.set({ blockedSites });
+
+  // Si no queda tiempo => bloquear
+  if ((site.remainingSeconds | 0) <= 0) return { block: true, site };
+
+  // Aún tiene saldo → no bloquear
+  return { block: false };
+}
+
 function todayKey(d = new Date()) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -422,4 +471,30 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
 });
+
+
+chrome.webNavigation.onCommitted.addListener(async (details) => {
+  try {
+    // Solo frame principal y URLs http/https
+    if (details.frameId !== 0) return;
+    const url = details.url || '';
+    const u = new URL(url);
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return;
+
+    // Ignorar nuestras páginas y páginas de Chrome
+    if (u.protocol === 'chrome-extension:' || u.protocol.startsWith('chrome')) return;
+
+    // ¿Debemos bloquear este destino?
+    const { block, site } = await shouldBlockNowForUrl(url);
+    if (!block || !site) return;
+
+    // Asegura regla (idempotente) y redirige
+    await addBlockRuleForSite(site);
+    const blockedUrl = chrome.runtime.getURL('blocked.html') + `?host=${encodeURIComponent(site.fullUrl)}`;
+    try { await chrome.tabs.update(details.tabId, { url: blockedUrl }); } catch {}
+  } catch {
+    // no-op
+  }
+});
+
 

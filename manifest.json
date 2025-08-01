@@ -3,7 +3,7 @@
   "name": "HyperFocus - Web Blocker and Web analytics",
   "description": "HyperFocus is a web blocker and web analytics tool that helps you to focus on your work and block the websites that distract you.",
   "version": "1.0.0",
-  "permissions": ["storage", "tabs", "alarms", "declarativeNetRequest"],
+  "permissions": ["storage", "tabs", "alarms", "declarativeNetRequest", "webNavigation"],
   "host_permissions": ["<all_urls>"],
   "background": { "service_worker": "background.js" },
   "action": { 
