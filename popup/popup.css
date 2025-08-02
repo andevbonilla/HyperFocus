@@ -148,10 +148,12 @@ border: 3px solid transparent;     /* crea “espacio” alrededor del thumb */
 }
 #form-submit {
     background: #9600cd;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     color: #fff;
 }
 #form-submit:hover {
     background: #a400df;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 #form-submit.disabled:hover {
     background: #9600cd;
@@ -159,10 +161,12 @@ border: 3px solid transparent;     /* crea “espacio” alrededor del thumb */
 }
 #form-cancel {
     background: #444;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     color: #fff;
 }
 #form-cancel:hover {
     background: #5c5c5c;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     color: #fff;
 }
 /* errores */
@@ -170,13 +174,6 @@ border: 3px solid transparent;     /* crea “espacio” alrededor del thumb */
     border: 1px solid red !important;
     color: red !important;
 }
-.error-message {
-    color: red;
-    font-size: 1rem;
-    margin-top: 0.3rem;
-    display: none;
-}
-
 /* ocultar el input color real */
 .color-input {
     position: absolute;
@@ -264,6 +261,29 @@ input[type='number'] {
     margin-top: 1rem;
     display: flex;
     flex-direction: column;
+}
+
+.error-group{
+    display: none;
+    align-items: center;
+    gap: .5rem;
+    width: 100%;
+    background-color: #ff3b3b;
+    border-radius: .5rem;
+    padding: .5rem .8rem;      /* +2px */
+    color: #fff;
+    font-size: 1rem;
+    margin-top: 0.3rem;
+}
+
+.error-group p{
+    margin: 0;
+    font-size: .8rem;
+    opacity: .8;
+}
+
+.error-group svg{
+    color: #fff;
 }
 
 .delete-btn {

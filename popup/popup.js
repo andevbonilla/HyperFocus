@@ -17,11 +17,17 @@ const submitBtn  = document.getElementById('form-submit');
 const previewDot = document.getElementById('color-preview');
 const colorInput = document.getElementById('color-input');
 const urlInput   = document.getElementById('url-input');
+
 const urlError   = document.getElementById('url-input-error');
+const urlErrorGroup = document.getElementById('url-input-error-group');
+
 const hrsInput   = document.getElementById('hrs-input');
 const minsInput  = document.getElementById('mins-input');
 const secsInput  = document.getElementById('secs-input');
+
 const timeError  = document.getElementById('time-input-error');
+const timeErrorGroup = document.getElementById('time-input-error-group');
+
 const list       = document.getElementById('blocked-list');
 const noBlockedSites = document.getElementById('no-blocked-sites');
 const alwaysOption = document.getElementById('always-option');
@@ -34,7 +40,8 @@ const addMins = document.getElementById('add-mins');
 const subSecs = document.getElementById('sub-secs');
 const addSecs = document.getElementById('add-secs');
 
-const generalError  = document.getElementById('general-error')
+const generalError  = document.getElementById('general-error');
+const generalErrorGroup = document.getElementById('general-error-group');
 
 // Regex de validación
 const urlRegex = /^(https?:\/\/)[^\s/$.?#].[^\s]*$/i;
@@ -148,10 +155,12 @@ function resetForm() {
 function validateURL() {
   if (!urlRegex.test(urlInput.value)) {
     urlInput.classList.add('input-error');
+    urlErrorGroup.style.display = 'flex';
     urlError.textContent = t('errUrlInvalid');
     return false;
   } else {
     urlInput.classList.remove('input-error');
+    urlErrorGroup.style.display = 'none';
     urlError.textContent = '';
     return true;
   }
@@ -203,15 +212,15 @@ function validateAndClampTime() {
     const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
     
     if (totalSeconds < 1) {
-      timeError.textContent = t('errTimeMin');;
-      timeError.style.display = 'block';
+      timeError.textContent = t('errTimeMin');
+      timeErrorGroup.style.display = 'flex';
       isValid = false;
     } else {
-      timeError.style.display = 'none';
+      timeErrorGroup.style.display = 'none';
     }
   } else {
     timeError.textContent = t('errTimeInvalid');
-    timeError.style.display = 'block';
+    timeErrorGroup.style.display = 'flex';
   }
 
   return isValid;
@@ -266,7 +275,7 @@ addHours.addEventListener('click', () => {
   } else {
     let newValue = parseInt(hrsInput.value, 10) + 1;
     hrsInput.value = newValue > 23 ? 0 : newValue;
-    timeError.style.display = 'none';
+    timeErrorGroup.style.display = 'none';
     hrsInput.classList.remove('input-error');
   }
   toggleSummitButton();
@@ -277,7 +286,7 @@ addMins.addEventListener('click', () => {
   } else {
     let newValue = parseInt(minsInput.value, 10) + 1;
     minsInput.value = newValue > 59 ? 0 : newValue;
-    timeError.style.display = 'none';
+    timeErrorGroup.style.display = 'none';
     minsInput.classList.remove('input-error');
   }
   toggleSummitButton();
@@ -288,7 +297,7 @@ addSecs.addEventListener('click', () => {
   } else {
     let newValue = parseInt(secsInput.value, 10) + 1;
     secsInput.value = newValue > 59 ? 0 : newValue;
-    timeError.style.display = 'none';
+    timeErrorGroup.style.display = 'none';
     secsInput.classList.remove('input-error');
   }
   toggleSummitButton();
@@ -299,7 +308,7 @@ subHours.addEventListener('click', () => {
   } else {
     let newValue = parseInt(hrsInput.value, 10) - 1;
     hrsInput.value = newValue < 0 ? 23 : newValue;
-    timeError.style.display = 'none';
+    timeErrorGroup.style.display = 'none';
     hrsInput.classList.remove('input-error');
   }
   toggleSummitButton();
@@ -310,7 +319,7 @@ subMins.addEventListener('click', () => {
   } else {
     let newValue = parseInt(minsInput.value, 10) - 1;
     minsInput.value = newValue < 0 ? 59 : newValue;
-    timeError.style.display = 'none';
+    timeErrorGroup.style.display = 'none';
     minsInput.classList.remove('input-error');
   }
   toggleSummitButton();
@@ -321,7 +330,7 @@ subSecs.addEventListener('click', () => {
   } else {
     let newValue = parseInt(secsInput.value, 10) - 1;
     secsInput.value = newValue < 0 ? 59 : newValue;
-    timeError.style.display = 'none';
+    timeErrorGroup.style.display = 'none';
     secsInput.classList.remove('input-error');
   }
   toggleSummitButton();
@@ -409,13 +418,13 @@ form.addEventListener('submit', async (e) => {
   };
 
   if (blockedSites.some(s => s.fullUrl === siteToSave.fullUrl)) {
-    generalError.style.display = 'block';
+    generalErrorGroup.style.display = 'flex';
     generalError.textContent = t('errDuplicateUrl');
     return;
   }
 
+  generalErrorGroup.style.display = 'none';
   generalError.textContent = '';
-  generalError.style.display = 'none';
 
   try {
     const resp = await chrome.runtime.sendMessage({ action: 'addBlockedSite', siteObjForm: siteToSave });
@@ -426,10 +435,12 @@ form.addEventListener('submit', async (e) => {
       resetForm();
     } else {
       console.error('addBlockedSite error:', resp?.error);
+      generalErrorGroup.style.display = 'flex';
       generalError.textContent = resp?.error;
     }
   } catch (e) {
     console.error('addBlockedSite error:', e);
+    generalErrorGroup.style.display = 'flex';
     generalError.textContent = e.message;
   }
 
