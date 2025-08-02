@@ -1,0 +1,233 @@
+/* Reset global box model and spacing */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Make sure html/body can stretch to full viewport height */
+  html,
+  body {
+    height: 100%;
+  }
+  
+  /* Contenedor principal en flex-column a full viewport */
+  #container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+    padding: 0 15%;
+    background: rgb(10, 13, 102);
+    overflow: hidden;
+  }
+  
+  /* Logo + nombre de la extensión */
+  #logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .3rem;
+    margin: 5rem 1.4rem 1.4rem;
+  }
+  #logo-container img {
+    width: 2rem;
+  }
+  #logo-container p {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #fff;
+  }
+  
+  /* Título bloqueado */
+  h1,
+  #blocked-title {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  
+  /* Contenedor del astronauta: ocupa el espacio sobrante y empuja al elemento al final */
+  #astronaut-container {
+    flex: 1;                  /* ocupa todo el espacio restante */
+    position: relative;       /* contexto para posicion absolute */
+    display: flex;
+    align-items: flex-end;    /* lo alinea abajo */
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  .blocked{
+    color: #ff3b3b;
+  }
+  
+  /* Astronauta en absolute pero siempre anclado al fondo del container */
+  #astronaut-container img,
+  #astronaut {
+    position: absolute;
+    bottom: 0;                /* en lugar de top */
+    width: 40rem;
+    animation: floating 2s ease-in-out infinite;
+  }
+
+  #star-1{
+    position: absolute;
+    top: 30%;
+    left: 10%;
+    width: 10rem;
+    animation: floating 2s ease-in-out infinite;
+    z-index: 1;
+  }
+  #star-2{
+    position: absolute;
+    top: 12%;
+    right: 10%;
+    width: 13rem;
+    animation: floating 2s ease-in-out infinite;
+    z-index: 1;
+  }
+  #star-3{
+    position: absolute;
+    bottom: 10%;
+    left: 20%;
+    width: 8rem;
+    animation: floating 2s ease-in-out infinite;
+    z-index: 1;
+  }
+  #star-4{
+    position: absolute;
+    bottom: 10%;
+    right: 28%;
+    width: 7rem;
+    animation: floating 2s ease-in-out infinite;
+    z-index: 1;
+  }
+  
+  /* Animación de flotación */
+  @keyframes floating {
+    from {
+      transform: translateY(2px) rotate(5deg);
+    }
+    50% {
+      transform: translateY(-2px) rotate(5deg);
+    }
+    to {
+      transform: translateY(2px) rotate(5deg);
+    }
+  }
+  
+  /* -------------------
+     Media Queries
+     ------------------- */
+  
+  /* Phone */
+  @media (max-width: 768px) {
+    #container {
+      padding: 0 4%;
+    }
+    #blocked-title {
+      font-size: 3rem;       /* tamaño de texto razonable en móvil */
+    }
+    #astronaut-container img {
+      width: 35rem;          /* escala en pantallas pequeñas */
+      bottom: -12rem;
+    }
+    #star-1{
+      display: none;
+    }
+    #star-2{
+      display: none;
+    }
+    #star-3{
+      display: none;
+    }
+    #star-4{
+      display: none;
+    }
+  }
+
+  @media(max-height: 680px){
+    #blocked-title {
+        font-size: 2rem !important;       /* tamaño de texto razonable en móvil */
+      }
+    #astronaut-container img {
+        width: 26rem !important;          /* escala en pantallas pequeñas */
+        bottom: -10rem !important;
+      }
+  }
+  
+  /* Tablet */
+  @media (max-width: 1024px) {
+    #container {
+      padding: 30% 10%;
+    }
+    #blocked-title {
+      font-size: 3rem;       /* tamaño de texto razonable en móvil */
+    }
+    #astronaut-container img {
+      width: 35rem;          /* escala en pantallas pequeñas */
+      bottom: -12rem;
+    }
+    #star-1{
+      width: 8rem;
+      left: 3%;
+    }
+    #star-2{
+      width: 12rem;
+      right: 3%;
+    }
+    #star-3{
+      width: 8rem;
+      left: 10%;
+    }
+    #star-4{
+      width: 7rem;
+      right: 10%;
+    }
+  }
+  
+  /* Desktop */
+  @media (max-width: 1440px) {
+    #container {
+      padding: 0 15%;
+    }
+    #blocked-title {
+      font-size: 3rem;       /* tamaño de texto razonable en móvil */
+    }
+    #astronaut-container img {
+      width: 35rem;          /* escala en pantallas pequeñas */
+      bottom: -12rem;
+    }
+  }
+  
+  /* Extra large desktop */
+  @media (max-width: 1600px) {
+    #container {
+      padding: 0 20%;
+    }   
+    #blocked-title {
+      font-size: 3rem;       /* tamaño de texto razonable en móvil */
+    }
+    #astronaut-container img {
+      width: 35rem;          /* escala en pantallas pequeñas */
+      bottom: -12rem;
+    }
+  }
+
+  /* Full HD */
+  @media (min-width: 1600px) {
+    #container {
+      padding: 0 25%;
+    }   
+    #blocked-title {
+      font-size: 3rem;       /* tamaño de texto razonable en móvil */
+    }
+    #astronaut-container img {
+      width: 45rem;          /* escala en pantallas pequeñas */
+      bottom: -12rem;
+    }
+  }
+  

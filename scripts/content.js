@@ -56,7 +56,7 @@
   
       // icono de cohete (puedes cambiar por tu propia URL o data-URI)
       const rocket = document.createElement('img');
-      rocket.src = chrome.runtime.getURL('icons/icon48.png');
+      rocket.src = chrome.runtime.getURL('assets/icon48.png');
       rocket.style.width = '24px';
       rocket.style.height = '24px';
       rocket.style.marginRight = '8px';

@@ -9,9 +9,9 @@
   "action": { 
     "default_popup": "popup/popup.html",
     "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
+      "16": "assets/icon16.png",
+      "48": "assets/icon48.png",
+      "128": "assets/icon128.png"
     } },
   "content_scripts": [{
     "matches": ["<all_urls>"],
@@ -19,7 +19,7 @@
     "run_at": "document_idle"
   }],
   "web_accessible_resources": [{
-    "resources": ["blocked.html", "scripts/blocked.js", "icons/icon48.png"],
+    "resources": ["blocked.html", "scripts/blocked.js", "assets/icon48.png", "blocked.css", "assets/astronaut.png", "assets/star.png"],
     "matches": ["<all_urls>"]
   }]
 }
