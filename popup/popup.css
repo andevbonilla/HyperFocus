@@ -273,12 +273,12 @@ input[type='number'] {
     padding: .5rem .8rem;      /* +2px */
     color: #fff;
     font-size: 1rem;
-    margin-top: 0.3rem;
+    margin: 0.3rem 0 0.4rem 0;
 }
 
 .error-group p{
     margin: 0;
-    font-size: .8rem;
+    font-size: .9rem;
     opacity: .8;
 }
 
