@@ -1,0 +1,44 @@
+{
+    "extName":             { "message": "HyperFocus – Webseiten-Blocker und bessere Konzentration", "description": "Name der Erweiterung" },
+    "extDescription":      { "message": "HyperFocus hilft dir, dich zu konzentrieren, indem ablenkende Webseiten blockiert werden.", "description": "Beschreibung der Erweiterung" },
+  
+    "popupTitle":          { "message": "HyperFocus" },
+    "popupCloseTitle":     { "message": "Schließen" },
+    "noBlockedSites":      { "message": "Noch keine blockierten Websites" },
+    "btnBlockCurrent":     { "message": "Aktuelle Website blockieren" },
+    "btnBlockOther":       { "message": "Andere Website blockieren" },
+  
+    "labelColor":          { "message": "Symbolfarbe:" },
+    "colorPickerTitle":    { "message": "Farbe auswählen" },
+  
+    "labelUrl":            { "message": "URL der zu blockierenden Website:" },
+    "phUrl":               { "message": "https://beispiel.de" },
+    "errUrlInvalid":       { "message": "Ungültige URL; sie muss mit http:// oder https:// beginnen" },
+  
+    "optTitle":            { "message": "Wähle eine Option:" },
+    "optAlwaysTitle":      { "message": "Immer" },
+    "optAlwaysDesc":       { "message": "Die Website bleibt dauerhaft blockiert." },
+    "optTimedTitle":       { "message": "Zeitbegrenzt" },
+    "optTimedDesc":        { "message": "Du kannst die Website täglich nur für eine festgelegte Zeit nutzen; danach wird sie blockiert." },
+  
+    "labelTime":           { "message": "Zeit:" },
+    "hoursShort":          { "message": "Std" },
+    "minutesShort":        { "message": "Min" },
+    "secondsShort":        { "message": "Sek" },
+    "phHours":             { "message": "Stunden" },
+    "phMinutes":           { "message": "Minuten" },
+    "phSeconds":           { "message": "Sekunden" },
+    "errTimeMin":          { "message": "Die Zeit muss mindestens 1 Sekunde betragen" },
+    "errTimeInvalid":      { "message": "Bitte gültige Werte eingeben" },
+  
+    "errDuplicateUrl":     { "message": "Es existiert bereits eine Website mit dieser URL" },
+    "btnAdd":              { "message": "Hinzufügen" },
+    "btnCancel":           { "message": "Abbrechen" },
+  
+    "titleDelete":         { "message": "Löschen" },
+  
+    "blockedPageTitle":    { "message": "Website blockiert" },
+    "blockedMain":         { "message": "Diese Website ist blockiert – hör auf zu prokrastinieren.", "placeholders": { "status": { "content": "$1" } } },
+    "blockedWord":         { "message": "blockiert" }
+  }
+  

@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Sitio bloqueado</title>
+  <title>__MSG_blockedPageTitle__</title>
   <link rel="stylesheet" href="blocked.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -12,14 +12,15 @@
         <img src="assets/icon48.png" alt="Logo">
         <p>HyperFocus</p>
     </div>
-    <h1 id="blocked-title">Este sitio esta <span class="blocked">bloqueado</span>, deja de procrastinar.</h1>
-    <div id="astronaut-container">
-      <img id="astronaut" src="assets/astronaut.png" alt="Astronaut">
-    </div>
-    <img id="star-1" src="assets/star.png" alt="star">
-    <img id="star-2" src="assets/star.png" alt="star">
-    <img id="star-3" src="assets/star.png" alt="star">
-    <img id="star-4" src="assets/star.png" alt="star">
+    <h1 id="blocked-title"></h1>
+    ...
   </div>
+  <script src="scripts/blocked.js"></script>
+  <script>
+    document.documentElement.lang = chrome.i18n.getMessage('@@ui_locale');
+    const blockedWord = chrome.i18n.getMessage('blockedWord');
+    const tpl = chrome.i18n.getMessage('blockedMain', [blockedWord]); 
+    document.getElementById('blocked-title').textContent = tpl;
+  </script>
 </body>
 </html>

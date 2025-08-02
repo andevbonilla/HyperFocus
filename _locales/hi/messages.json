@@ -1,0 +1,44 @@
+{
+    "extName":             { "message": "HyperFocus – वेबसाइट ब्लॉकर और एकाग्रता बढ़ाएँ", "description": "एक्सटेंशन का नाम" },
+    "extDescription":      { "message": "HyperFocus ध्यान भंग करने वाली वेबसाइटों को ब्लॉक करके आपकी एकाग्रता बढ़ाने में मदद करता है।", "description": "एक्सटेंशन विवरण" },
+  
+    "popupTitle":          { "message": "HyperFocus" },
+    "popupCloseTitle":     { "message": "बंद करें" },
+    "noBlockedSites":      { "message": "अभी तक कोई साइट ब्लॉक नहीं है" },
+    "btnBlockCurrent":     { "message": "वर्तमान साइट ब्लॉक करें" },
+    "btnBlockOther":       { "message": "अन्य साइट ब्लॉक करें" },
+  
+    "labelColor":          { "message": "आइकन का रंग:" },
+    "colorPickerTitle":    { "message": "रंग चुनें" },
+  
+    "labelUrl":            { "message": "ब्लॉक करने के लिए साइट का URL:" },
+    "phUrl":               { "message": "https://example.com" },
+    "errUrlInvalid":       { "message": "अमान्य URL; यह http:// या https:// से शुरू होना चाहिए" },
+  
+    "optTitle":            { "message": "एक विकल्प चुनें:" },
+    "optAlwaysTitle":      { "message": "हमेशा" },
+    "optAlwaysDesc":       { "message": "यह साइट हमेशा ब्लॉक रहेगी।" },
+    "optTimedTitle":       { "message": "समय-सीमित" },
+    "optTimedDesc":        { "message": "आप प्रतिदिन केवल निर्धारित समय तक साइट का उपयोग कर सकते हैं; उसके बाद यह ब्लॉक हो जाएगी।" },
+  
+    "labelTime":           { "message": "समय:" },
+    "hoursShort":          { "message": "घं" },
+    "minutesShort":        { "message": "मि" },
+    "secondsShort":        { "message": "से" },
+    "phHours":             { "message": "घंटे" },
+    "phMinutes":           { "message": "मिनट" },
+    "phSeconds":           { "message": "सेकंड" },
+    "errTimeMin":          { "message": "समय कम से कम 1 सेकंड होना चाहिए" },
+    "errTimeInvalid":      { "message": "कृपया मान्य मान दर्ज करें" },
+  
+    "errDuplicateUrl":     { "message": "इस URL वाली साइट पहले से मौजूद है" },
+    "btnAdd":              { "message": "जोड़ें" },
+    "btnCancel":           { "message": "रद्द करें" },
+  
+    "titleDelete":         { "message": "हटाएँ" },
+  
+    "blockedPageTitle":    { "message": "साइट ब्लॉक की गई" },
+    "blockedMain":         { "message": "यह साइट ब्लॉक है, टालमटोल बंद करें।", "placeholders": { "status": { "content": "$1" } } },
+    "blockedWord":         { "message": "ब्लॉक" }
+  }
+  

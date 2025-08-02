@@ -1,0 +1,44 @@
+{
+    "extName":             { "message": "HyperFocus – 网站拦截与专注提升", "description": "扩展名称" },
+    "extDescription":      { "message": "HyperFocus 通过拦截让你分心的网站，帮助你更专注。", "description": "扩展描述" },
+  
+    "popupTitle":          { "message": "HyperFocus" },
+    "popupCloseTitle":     { "message": "关闭" },
+    "noBlockedSites":      { "message": "还没有被拦截的网站" },
+    "btnBlockCurrent":     { "message": "拦截当前网站" },
+    "btnBlockOther":       { "message": "拦截其他网站" },
+  
+    "labelColor":          { "message": "图标颜色：" },
+    "colorPickerTitle":    { "message": "选择颜色" },
+  
+    "labelUrl":            { "message": "要拦截的网站 URL：" },
+    "phUrl":               { "message": "https://example.com" },
+    "errUrlInvalid":       { "message": "无效的 URL；必须以 http:// 或 https:// 开头" },
+  
+    "optTitle":            { "message": "选择一个选项：" },
+    "optAlwaysTitle":      { "message": "始终" },
+    "optAlwaysDesc":       { "message": "该网站将始终被拦截。" },
+    "optTimedTitle":       { "message": "限时" },
+    "optTimedDesc":        { "message": "每天只能在设定时间内使用该网站；之后将被拦截。" },
+  
+    "labelTime":           { "message": "时间：" },
+    "hoursShort":          { "message": "时" },
+    "minutesShort":        { "message": "分" },
+    "secondsShort":        { "message": "秒" },
+    "phHours":             { "message": "小时" },
+    "phMinutes":           { "message": "分钟" },
+    "phSeconds":           { "message": "秒" },
+    "errTimeMin":          { "message": "时间至少为 1 秒" },
+    "errTimeInvalid":      { "message": "请输入有效的数值" },
+  
+    "errDuplicateUrl":     { "message": "已存在具有该 URL 的网站" },
+    "btnAdd":              { "message": "添加" },
+    "btnCancel":           { "message": "取消" },
+  
+    "titleDelete":         { "message": "删除" },
+  
+    "blockedPageTitle":    { "message": "网站已拦截" },
+    "blockedMain":         { "message": "此网站已被拦截，别再拖延了。", "placeholders": { "status": { "content": "$1" } } },
+    "blockedWord":         { "message": "已拦截" }
+  }
+  

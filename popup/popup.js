@@ -1,5 +1,8 @@
 // popup.js
 
+// alias para chrome.i18n.getMessage
+const t = chrome.i18n.getMessage;
+
 // main variables
 let blockedSites = [];
 let hasTimeToggle = null;
@@ -68,9 +71,16 @@ async function addBlockedSiteToDOM(site) {
     return;
   }
 
+  // Etiquetas cortas localizadas
+  const H = t('hoursShort')   || 'H';
+  const M = t('minutesShort') || 'M';
+  const S = t('secondsShort') || 'S';
+  const deleteTitle = t('titleDelete') || 'Delete';
+
   const li = document.createElement('li');
   li.className = 'blocked-item glass-bg';
   li.id = `blocked-item-${id}`;
+
   li.innerHTML = `
     <div style="display: flex; align-items: center; overflow-x: hidden;">
       <span class="dot" id="dot-${id}" style="background:${color}"></span>
@@ -82,20 +92,20 @@ async function addBlockedSiteToDOM(site) {
         `
           <div style="display: flex; align-items: center; margin-left: .4rem;">
             <time class="timer" style="font-size: .9rem;" id="timer-${id}">${time.split(':')[0]}</time>
-            <span style="font-size: .8rem; font-weight: bold; padding-left: .2rem;">H</span>
+            <span style="font-size: .8rem; font-weight: bold; padding-left: .2rem;">${H}</span>
           </div>
           <div style="display: flex; align-items: center; margin-left: .4rem;">
             <time class="timer" style="font-size: .9rem;" id="timer-${id}">${time.split(':')[1]}</time>
-            <span style="font-size: .8rem; font-weight: bold; padding-left: .2rem;">M</span>
+            <span style="font-size: .8rem; font-weight: bold; padding-left: .2rem;">${M}</span>
           </div>
           <div style="display: flex; align-items: center; margin-left: .4rem;">
             <time class="timer" style="font-size: .9rem;" id="timer-${id}">${time.split(':')[2]}</time>
-            <span style="font-size: .8rem; font-weight: bold; padding-left: .2rem;">S</span>
+            <span style="font-size: .8rem; font-weight: bold; padding-left: .2rem;">${S}</span>
           </div>
         `
         : ''
       }
-      <button class="delete-btn" id="delete-${id}" title="Eliminar">
+      <button class="delete-btn" id="delete-${id}" title="${deleteTitle}">
           <svg xmlns="http://www.w3.org/2000/svg"
               width="24" height="24"
               viewBox="0 0 24 24"
@@ -116,6 +126,7 @@ async function addBlockedSiteToDOM(site) {
         </button>
     </div>
   `;
+
   li.querySelector('.delete-btn').addEventListener('click', async () => await removeBlockedSite(id));
   list.appendChild(li);
 }
@@ -137,7 +148,7 @@ function resetForm() {
 function validateURL() {
   if (!urlRegex.test(urlInput.value)) {
     urlInput.classList.add('input-error');
-    urlError.textContent = 'URL inválida, debe empezar por http:// o https://';
+    urlError.textContent = t('errUrlInvalid');
     return false;
   } else {
     urlInput.classList.remove('input-error');
@@ -192,14 +203,14 @@ function validateAndClampTime() {
     const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
     
     if (totalSeconds < 1) {
-      timeError.textContent = 'El tiempo debe ser de al menos 1 segundo';
+      timeError.textContent = t('errTimeMin');;
       timeError.style.display = 'block';
       isValid = false;
     } else {
       timeError.style.display = 'none';
     }
   } else {
-    timeError.textContent = 'Por favor ingrese valores válidos';
+    timeError.textContent = t('errTimeInvalid');
     timeError.style.display = 'block';
   }
 
@@ -399,7 +410,7 @@ form.addEventListener('submit', async (e) => {
 
   if (blockedSites.some(s => s.fullUrl === siteToSave.fullUrl)) {
     generalError.style.display = 'block';
-    generalError.textContent = 'Ya existe un sitio con esa URL';
+    generalError.textContent = t('errDuplicateUrl');
     return;
   }
 
@@ -426,6 +437,7 @@ form.addEventListener('submit', async (e) => {
 
 
 // Arranca
-document.addEventListener('DOMContentLoaded', loadBlockedSites); 
-
-  
+document.addEventListener('DOMContentLoaded', () => {
+  document.documentElement.lang = chrome.i18n.getMessage('@@ui_locale');
+  loadBlockedSites();
+});

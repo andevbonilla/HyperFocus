@@ -1,0 +1,44 @@
+{
+    "extName":             { "message": "HyperFocus – サイトブロッカー＆集中力向上", "description": "拡張機能名" },
+    "extDescription":      { "message": "HyperFocus は、気が散るウェブサイトをブロックして集中力を高めます。", "description": "拡張機能の説明" },
+  
+    "popupTitle":          { "message": "HyperFocus" },
+    "popupCloseTitle":     { "message": "閉じる" },
+    "noBlockedSites":      { "message": "ブロックされたサイトはまだありません" },
+    "btnBlockCurrent":     { "message": "現在のサイトをブロック" },
+    "btnBlockOther":       { "message": "別のサイトをブロック" },
+  
+    "labelColor":          { "message": "アイコンの色：" },
+    "colorPickerTitle":    { "message": "色を選択" },
+  
+    "labelUrl":            { "message": "ブロックするサイトのURL：" },
+    "phUrl":               { "message": "https://example.com" },
+    "errUrlInvalid":       { "message": "無効なURLです。http:// または https:// で始まる必要があります" },
+  
+    "optTitle":            { "message": "オプションを選択：" },
+    "optAlwaysTitle":      { "message": "常に" },
+    "optAlwaysDesc":       { "message": "このサイトは常にブロックされます。" },
+    "optTimedTitle":       { "message": "時間制限" },
+    "optTimedDesc":        { "message": "1日に設定した時間のみ利用でき、その後はブロックされます。" },
+  
+    "labelTime":           { "message": "時間：" },
+    "hoursShort":          { "message": "時" },
+    "minutesShort":        { "message": "分" },
+    "secondsShort":        { "message": "秒" },
+    "phHours":             { "message": "時" },
+    "phMinutes":           { "message": "分" },
+    "phSeconds":           { "message": "秒" },
+    "errTimeMin":          { "message": "時間は1秒以上である必要があります" },
+    "errTimeInvalid":      { "message": "正しい値を入力してください" },
+  
+    "errDuplicateUrl":     { "message": "そのURLのサイトは既に存在します" },
+    "btnAdd":              { "message": "追加" },
+    "btnCancel":           { "message": "キャンセル" },
+  
+    "titleDelete":         { "message": "削除" },
+  
+    "blockedPageTitle":    { "message": "サイトはブロックされています" },
+    "blockedMain":         { "message": "このサイトはブロックされています。先延ばしはやめましょう。", "placeholders": { "status": { "content": "$1" } } },
+    "blockedWord":         { "message": "ブロック済み" }
+  }
+  

@@ -1,0 +1,44 @@
+{
+    "extName":             { "message": "HyperFocus – Bloqueador de sites e melhora sua concentração", "description": "Nome da extensão" },
+    "extDescription":      { "message": "O HyperFocus ajuda você a se concentrar bloqueando sites que distraem.", "description": "Descrição da extensão" },
+  
+    "popupTitle":          { "message": "HyperFocus" },
+    "popupCloseTitle":     { "message": "Fechar" },
+    "noBlockedSites":      { "message": "Ainda não há sites bloqueados" },
+    "btnBlockCurrent":     { "message": "Bloquear site atual" },
+    "btnBlockOther":       { "message": "Bloquear outro site" },
+  
+    "labelColor":          { "message": "Cor do ícone:" },
+    "colorPickerTitle":    { "message": "Selecionar cor" },
+  
+    "labelUrl":            { "message": "URL do site a bloquear:" },
+    "phUrl":               { "message": "https://exemplo.com" },
+    "errUrlInvalid":       { "message": "URL inválida; deve começar com http:// ou https://" },
+  
+    "optTitle":            { "message": "Escolha uma opção:" },
+    "optAlwaysTitle":      { "message": "Sempre" },
+    "optAlwaysDesc":       { "message": "O site permanecerá sempre bloqueado." },
+    "optTimedTitle":       { "message": "Com tempo" },
+    "optTimedDesc":        { "message": "Você só poderá usar o site por um tempo determinado por dia; depois ele será bloqueado." },
+  
+    "labelTime":           { "message": "Tempo:" },
+    "hoursShort":          { "message": "h" },
+    "minutesShort":        { "message": "min" },
+    "secondsShort":        { "message": "s" },
+    "phHours":             { "message": "Horas" },
+    "phMinutes":           { "message": "Min" },
+    "phSeconds":           { "message": "Seg" },
+    "errTimeMin":          { "message": "O tempo deve ser de pelo menos 1 segundo" },
+    "errTimeInvalid":      { "message": "Insira valores válidos" },
+  
+    "errDuplicateUrl":     { "message": "Já existe um site com essa URL" },
+    "btnAdd":              { "message": "Adicionar" },
+    "btnCancel":           { "message": "Cancelar" },
+  
+    "titleDelete":         { "message": "Excluir" },
+  
+    "blockedPageTitle":    { "message": "Site bloqueado" },
+    "blockedMain":         { "message": "Este site está bloqueado, pare de procrastinar.", "placeholders": { "status": { "content": "$1" } } },
+    "blockedWord":         { "message": "bloqueado" }
+  }
+  

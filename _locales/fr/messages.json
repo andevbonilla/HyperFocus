@@ -1,0 +1,44 @@
+{
+    "extName":             { "message": "HyperFocus – Bloqueur de sites et améliore votre concentration", "description": "Nom de l’extension" },
+    "extDescription":      { "message": "HyperFocus vous aide à vous concentrer en bloquant les sites qui vous distraient.", "description": "Description de l’extension" },
+  
+    "popupTitle":          { "message": "HyperFocus" },
+    "popupCloseTitle":     { "message": "Fermer" },
+    "noBlockedSites":      { "message": "Aucun site bloqué pour le moment" },
+    "btnBlockCurrent":     { "message": "Bloquer le site actuel" },
+    "btnBlockOther":       { "message": "Bloquer un autre site" },
+  
+    "labelColor":          { "message": "Couleur de l’icône :" },
+    "colorPickerTitle":    { "message": "Sélectionner une couleur" },
+  
+    "labelUrl":            { "message": "URL du site à bloquer :" },
+    "phUrl":               { "message": "https://exemple.com" },
+    "errUrlInvalid":       { "message": "URL invalide ; elle doit commencer par http:// ou https://" },
+  
+    "optTitle":            { "message": "Choisissez une option :" },
+    "optAlwaysTitle":      { "message": "Toujours" },
+    "optAlwaysDesc":       { "message": "Le site restera bloqué en permanence." },
+    "optTimedTitle":       { "message": "Limité dans le temps" },
+    "optTimedDesc":        { "message": "Vous pouvez utiliser le site pendant un temps défini chaque jour ; ensuite il sera bloqué." },
+  
+    "labelTime":           { "message": "Temps :" },
+    "hoursShort":          { "message": "h" },
+    "minutesShort":        { "message": "min" },
+    "secondsShort":        { "message": "s" },
+    "phHours":             { "message": "Heures" },
+    "phMinutes":           { "message": "Min" },
+    "phSeconds":           { "message": "Sec" },
+    "errTimeMin":          { "message": "Le temps doit être d’au moins 1 seconde" },
+    "errTimeInvalid":      { "message": "Veuillez saisir des valeurs valides" },
+  
+    "errDuplicateUrl":     { "message": "Un site avec cette URL existe déjà" },
+    "btnAdd":              { "message": "Ajouter" },
+    "btnCancel":           { "message": "Annuler" },
+  
+    "titleDelete":         { "message": "Supprimer" },
+  
+    "blockedPageTitle":    { "message": "Site bloqué" },
+    "blockedMain":         { "message": "Ce site est bloqué, arrêtez de procrastiner.", "placeholders": { "status": { "content": "$1" } } },
+    "blockedWord":         { "message": "bloqué" }
+  }
+  

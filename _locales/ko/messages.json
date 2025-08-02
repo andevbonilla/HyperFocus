@@ -1,0 +1,44 @@
+{
+    "extName":             { "message": "HyperFocus – 사이트 차단 및 집중력 향상", "description": "확장 프로그램 이름" },
+    "extDescription":      { "message": "HyperFocus는 방해가 되는 웹사이트를 차단하여 집중력을 높여 줍니다.", "description": "확장 프로그램 설명" },
+  
+    "popupTitle":          { "message": "HyperFocus" },
+    "popupCloseTitle":     { "message": "닫기" },
+    "noBlockedSites":      { "message": "아직 차단된 사이트가 없습니다" },
+    "btnBlockCurrent":     { "message": "현재 사이트 차단" },
+    "btnBlockOther":       { "message": "다른 사이트 차단" },
+  
+    "labelColor":          { "message": "아이콘 색상:" },
+    "colorPickerTitle":    { "message": "색상 선택" },
+  
+    "labelUrl":            { "message": "차단할 사이트 URL:" },
+    "phUrl":               { "message": "https://example.com" },
+    "errUrlInvalid":       { "message": "잘못된 URL입니다. http:// 또는 https:// 로 시작해야 합니다" },
+  
+    "optTitle":            { "message": "옵션 선택:" },
+    "optAlwaysTitle":      { "message": "항상" },
+    "optAlwaysDesc":       { "message": "이 사이트는 항상 차단됩니다." },
+    "optTimedTitle":       { "message": "시간 제한" },
+    "optTimedDesc":        { "message": "하루에 설정된 시간만 사이트를 사용할 수 있으며, 이후에는 차단됩니다." },
+  
+    "labelTime":           { "message": "시간:" },
+    "hoursShort":          { "message": "시" },
+    "minutesShort":        { "message": "분" },
+    "secondsShort":        { "message": "초" },
+    "phHours":             { "message": "시간" },
+    "phMinutes":           { "message": "분" },
+    "phSeconds":           { "message": "초" },
+    "errTimeMin":          { "message": "시간은 최소 1초 이상이어야 합니다" },
+    "errTimeInvalid":      { "message": "유효한 값을 입력하세요" },
+  
+    "errDuplicateUrl":     { "message": "해당 URL의 사이트가 이미 존재합니다" },
+    "btnAdd":              { "message": "추가" },
+    "btnCancel":           { "message": "취소" },
+  
+    "titleDelete":         { "message": "삭제" },
+  
+    "blockedPageTitle":    { "message": "사이트 차단됨" },
+    "blockedMain":         { "message": "이 사이트는 차단되었습니다. 미루기는 이제 그만하세요.", "placeholders": { "status": { "content": "$1" } } },
+    "blockedWord":         { "message": "차단됨" }
+  }
+  
