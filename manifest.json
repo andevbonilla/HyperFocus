@@ -19,7 +19,7 @@
     "run_at": "document_idle"
   }],
   "web_accessible_resources": [{
-    "resources": ["blocked.html", "scripts/blocked.js", "assets/icon48.png", "blocked.css", "assets/astronaut.png", "assets/star.png"],
+    "resources": ["blocked.html", "assets/icon48.png", "blocked.css", "assets/astronaut.png", "assets/star.png"],
     "matches": ["<all_urls>"]
   }]
 }
